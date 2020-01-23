@@ -1,0 +1,54 @@
+body {
+	height: calc(100% - 63px);
+	margin: 20px 20px 0 20px;
+}
+.action-container {
+	margin-bottom: 20px;
+}
+#grid {
+	margin-bottom: 30px;
+}
+
+#windowContent {
+	overflow: auto;
+	height: 100%;
+	position: relative;
+}
+#request-window-content {
+	height: calc(100% - 70px);
+	padding: 30px;
+}
+#request-window-content textarea {
+	resize: vertical;
+}
+.window-action-panel {
+	float: right;
+	margin-top: 15px;
+	margin-right: 10px;
+}
+.jqx-loader-modal {
+	z-index: 9999999
+}
+.jqx-widget.jqx-loader {
+	z-index: 99999999
+}
+
+.number-cell {
+	margin-top: 18px;
+	text-align: center;
+}
+
+#leave-admin-comment {
+	display: none;
+}
+.detail-view-container {
+	width: 1020px !important;
+}
+.detail-view-container textarea {
+	resize: vertical;
+}
+div[id*="footerViewinnerCalendarjqxWidget"] {
+	position: absolute;
+	bottom: 13px;
+	left: 50px;
+}

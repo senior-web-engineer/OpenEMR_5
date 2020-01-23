@@ -1,0 +1,52 @@
+
+
+<div data-bind="visible: showTextImporter" class="modalDialog" >
+    <div><!-- this div required for modal -->
+        <h2 data-bind="text: heading" ></h2>
+
+        <div data-bind="foreach: selectors" class="selectorscontainer" >
+            <span data-bind="text: $data.select1label" ></span>
+            <br>
+            <div class="loaderMsg" data-bind="visible: $data.showLoader">Please Wait, Loading Library... &nbsp</div>
+	        <div id="loader" data-bind="visible: $data.showLoader"></div>
+	        <div class="selectors">
+	            <!-- ko if: $data.control == 'dropdownlist' -->
+	            <select data-bind="options: $data.select1list,
+	                                   optionsText: 'shortDesc',
+	                                   value: $data.selected1,
+	                                   optionsCaption: 'Choose...'"></select>
+	            <br/>
+	            <br/>
+	            <!-- /ko -->
+	            <!-- ko if: $data.control == 'singleselector' -->
+	            <ul data-bind="foreach: $data.select1list" class="selectorUl" >
+	                <li>
+	                    <span data-bind="text: $data.desc" ></span>
+	                    <button data-bind="click: $parent.selected1" >Select</button>
+	                </li>
+	            </ul>
+	            <!-- /ko -->
+            </div>
+        </div>
+        
+        <div class="selecteditems" > 
+            You have chosen:<br/> 
+            <div data-bind="foreach: selectors " >
+                <div data-bind="visible:  $parent.selected1val() === selected1val ">
+                    For <span data-bind="text: select1label"></span>:&nbsp;
+                    <span data-bind="text: selected1() ? selected1().desc : ''"></span>
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttonpanel" >
+            <button data-bind="click: clickSave" >Continue</button>
+            <button data-bind="click: clickCancel" >Cancel</button>
+        </div>
+    </div>
+</div>
+<div>
+    <button class="opentibutton" data-bind="click: clickTIButton">Select</button>
+</div>

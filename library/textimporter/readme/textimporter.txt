@@ -1,0 +1,16 @@
+textimporter folder should go under the Library folder
+
+
+form_textimporter_selectors Table 
+
+Where clause
+- token source
+- %1$s  comes from the parent dropdown's selected id
+- %2$s  comes from a page parameter params: {id1: $xyz}
+- %3$s  comes from selectors that have rememberId = 1
+
+to see the query uncomment !!! DEBUG ONLY !!! line
+
+getParentId 
+- in denpendency relationship of selectors the parent is always 0 and all    child nodes are 1
+- in an independent set of controls both are 0

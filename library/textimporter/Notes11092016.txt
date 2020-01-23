@@ -1,0 +1,25 @@
+
+
+
+you need to specify the value and desc like this:
+    SELECT table.valueField AS 'value', table.descriptionField AS 'desc', table.otherFields
+
+version = 2 for new customSelectFrom
+
+sample customSelectFrom
+
+select CONCAT(fe.date,'-',fe.encounter) as 'desc', tp.id  as 'value'
+from form_encounter as fe inner join forms as f 
+  on fe.encounter = f.encounter
+ inner join form_treatment_plan as tp 
+  on f.form_id = tp.id
+where fe.pid = {pid}
+  and f.form_name = 'treatment plan'
+  and f.pid = {pid}
+  and f.deleted = 0
+  and tp.status = 'Ready for Billing/Supervisor'
+  and fe.encounter <> {encounter}
+Order by fe.date desc, tp.id desc
+limit 10;
+
+

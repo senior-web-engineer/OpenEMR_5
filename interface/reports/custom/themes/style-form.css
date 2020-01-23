@@ -1,0 +1,118 @@
+﻿body
+{
+	background:#FFF;
+	color: #333;
+	font-family: Tahoma, Arial, Verdana, sans-serif;
+	font-size:small;
+	text-align: left;
+}
+form {
+	width: 60%;
+	min-width: 700px;
+	background: #EEE;
+	border: 1px solid #888;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	margin: 15px 15px 15px 20px;
+	padding: 15px;
+    -moz-box-shadow: 3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow: 3px 3px 5px 6px #ccc;
+ }
+textarea, input, select, textbox {
+	border-radius: 5px;
+	border-color: #999;
+	font-family: Tahoma, Arial, Verdana, sans-serif;
+	font-size: 10pt;
+}
+textarea{
+	padding: 5px;
+	width: 100%;
+}
+h1 {
+	text-align: center;
+	font-size: 12pt;
+	margin-bottom: 0px;
+}
+.title {
+	font-size: 12pt;
+}
+.clr{
+	clear:both;
+}
+table tr td{
+	padding: 10px;
+}
+table tr:hover{
+	background: #CCC;
+}
+input[readonly=readonly] {
+  background:yellow;
+  color:blue;
+  cursor:default;
+}
+.save, .dontsave, .printform  {
+	cursor: pointer;
+}
+.save:hover, .dontsave:hover, .printform:hover  {
+	background: #FFF;
+}
+/*PROBLEM(S) & FORM(S)*/
+.problems-goals input[type=checkbox] {
+	top: 40px;
+	position: relative;
+	float: left;
+	left: 30px;
+	width: 20px;
+	height: 20px;
+}
+.problems-goals .progo{
+	padding-left: 70px;
+	display: inline-block;
+	min-height: 80px;
+}
+
+/*SIGNATURE AREA */
+.mf_sig_wrapper{
+	border: 1px #999 solid;
+}
+.sig {
+	margin: 15px 0px;
+}
+.sig-name, .sig-pad, .sig-date {
+	float:left;
+	margin-right: 20px;
+}
+.sig-name {
+	width: 200px;
+}
+.sig-date {
+	margin-right: 0px!important;
+}
+/*COLUMNS*/
+li.section_break div {
+	width: 100%;
+}
+li.section_break div span {
+	width: 30%;
+	display: inline-block;
+	vertical-align: top;
+}
+/*WARNINGS*/
+.tp-warning {
+	background: #CCC;
+    width: 50%;
+    text-align: center;
+    margin: 0 auto;
+    border: 5px solid #FFF;
+    border-radius: 10px;
+    padding: 60px 10px;
+    box-shadow: 4px 3px 5px #000;
+    color: #F00;
+    font-weight: bold;
+}
+.tp-alert {
+	width: 60%;
+	padding: 10px;
+	margin: 15px 15px 15px 20px;
+}

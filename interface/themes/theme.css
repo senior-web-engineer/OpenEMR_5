@@ -1,0 +1,707 @@
+﻿body{
+	background: #d8d8d8;
+	color:  #666666;
+	font-family: "Times New Roman", Times, serif;
+	font-size: large;
+	text-align: left;
+    margin-bottom: 0px;
+    height: auto;   
+}
+
+div.banner{
+    
+    width:auto;
+    background-color: #f2f2f2;
+    border: 1px solid #888;
+	border-radius: 10px;
+    padding-bottom: 15px;
+    padding-top: 15px;
+    padding-left: 15px;
+    text-align: justify;
+}
+
+div{
+    margin: 10px;
+    padding-bottom: 10px;
+    
+}
+
+div.button{
+    margin-top: 10px;
+    text-align: center;
+    width: auto;
+}
+.btn{
+  border: none;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/*removes bullets from list*/
+ul.blank{
+    list-style-type: none;
+    display: block;
+    padding-left: 0px;
+}
+
+
+/* Customize the label (the container) */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px !important;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+  left: 9px;
+  top: 6px;
+  width: 7px;
+  height: 14px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+/* The container for the radio btn */
+.container-radio {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.container-radio input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Create a custom radio button */
+.checkmark-radio {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.container-radio:hover input ~ .checkmark-radio {
+  background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.container-radio input:checked ~ .checkmark-radio {
+  background-color: #2196F3;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark-radio:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.container-radio .checkmark-radio:after {
+ 	top: 9px;
+	left: 9px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: white;
+}
+/*select menu*/
+.select-css {
+    position: relative; */
+    display: block;
+    overflow: hidden;
+    padding: 0 0 0 8px;
+    height: 25px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    background-color: #fff;
+    background: -webkit-gradient(linear,50% 0,50% 100%,color-stop(20%,#fff),color-stop(50%,#f6f6f6),color-stop(52%,#eee),color-stop(100%,#f4f4f4));
+    background: -webkit-linear-gradient(#fff 20%,#f6f6f6 50%,#eee 52%,#f4f4f4 100%);
+    background: -moz-linear-gradient(#fff 20%,#f6f6f6 50%,#eee 52%,#f4f4f4 100%);
+    background: -o-linear-gradient(#fff 20%,#f6f6f6 50%,#eee 52%,#f4f4f4 100%);
+    background: linear-gradient(#fff 20%,#f6f6f6 50%,#eee 52%,#f4f4f4 100%);
+    background-clip: padding-box;
+    box-shadow: 0 0 3px #fff inset, 0 1px 1px rgba(0,0,0,.1);
+    color: #444;
+    text-decoration: none;
+    line-height: 24px;
+}
+.select-css::-ms-expand {
+    display: none;
+}
+.select-css:hover {
+    border-color: #888;
+}
+.select-css:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
+    box-shadow: 0 0 0 3px -moz-mac-focusring; 
+    outline: none;
+}
+.select-css option {
+    font-weight:normal;
+}
+
+/*input boxes*/
+.input-css {
+    position: relative; */
+    display: inline;
+    overflow: hidden;
+    padding: 0 0 0 8px;
+    height: 25px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    background-color: #fff;
+    background-clip: padding-box;
+    box-shadow: 0 0 3px #fff inset, 0 1px 1px rgba(0,0,0,.1);
+    color: #444;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 24px;
+    width: auto;
+}
+.input-css::-ms-expand {
+    display: none;
+}
+.input-css:hover {
+    border-color: #888;
+}
+.input-css:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
+    box-shadow: 0 0 0 3px -moz-mac-focusring; 
+    outline: none;
+}
+.input-css option {
+    font-weight:normal;
+}
+/*navbar*/
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #f8f8f8;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    margin-bottom: 10px;
+    margin-top: 0px;
+    padding-left: 200px;
+    padding-bottom: 0px; 
+    z-index: 1000;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #777;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/*calendar*/
+.calendar {
+  position: relative;
+  display: none;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  border-left: 2px solid #fff;
+  font-size: 11px;
+  color: #000;
+  cursor: default;
+  background: #d4d0c8;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.calendar table {
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+  font-size: 11px;
+  color: #000;
+  cursor: default;
+  background: #d4d0c8;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+/* Header part -- contains navigation buttons and day names. */
+
+.calendar .button { /* "<<", "<", ">", ">>" buttons have this class */
+  text-align: center;
+  padding: 1px;
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+}
+
+.calendar .nav {
+  background: transparent url(menuarrow.gif) no-repeat 100% 100%;
+}
+
+.calendar thead .title { /* This holds the current "month, year" */
+  font-weight: bold;
+  padding: 1px;
+  border: 1px solid #000;
+  background: #848078;
+  color: #fff;
+  text-align: center;
+}
+
+.calendar thead .headrow { /* Row <TR> containing navigation buttons */
+}
+
+.calendar thead .daynames { /* Row <TR> containing the day names */
+}
+
+.calendar thead .name { /* Cells <TD> containing the day names */
+  border-bottom: 1px solid #000;
+  padding: 2px;
+  text-align: center;
+  background: #f4f0e8;
+}
+
+.calendar thead .weekend { /* How a weekend day name shows in header */
+  color: #f00;
+}
+
+.calendar thead .hilite { /* How do the buttons in header appear when hover */
+  border-top: 2px solid #fff;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  border-left: 2px solid #fff;
+  padding: 0px;
+  background-color: #e4e0d8;
+}
+
+.calendar thead .active { /* Active (pressed) buttons in header */
+  padding: 2px 0px 0px 2px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+  background-color: #c4c0b8;
+}
+
+/* The body part -- contains all the days in month. */
+
+.calendar tbody .day { /* Cells <TD> containing month days dates */
+  width: 2em;
+  text-align: right;
+  padding: 2px 4px 2px 2px;
+}
+.calendar tbody .day.othermonth {
+  font-size: 80%;
+  color: #aaa;
+}
+.calendar tbody .day.othermonth.oweekend {
+  color: #faa;
+}
+
+.calendar table .wn {
+  padding: 2px 3px 2px 2px;
+  border-right: 1px solid #000;
+  background: #f4f0e8;
+}
+
+.calendar tbody .rowhilite td {
+  background: #e4e0d8;
+}
+
+.calendar tbody .rowhilite td.wn {
+  background: #d4d0c8;
+}
+
+.calendar tbody td.hilite { /* Hovered cells <TD> */
+  padding: 1px 3px 1px 1px;
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+}
+
+.calendar tbody td.active { /* Active (pressed) cells <TD> */
+  padding: 2px 2px 0px 2px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+}
+
+.calendar tbody td.selected { /* Cell showing selected date */
+  font-weight: bold;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+  padding: 2px 2px 0px 2px;
+  background: #e4e0d8;
+}
+
+.calendar tbody td.weekend { /* Cells showing weekend days */
+  color: #f00;
+}
+
+.calendar tbody td.today { /* Cell showing today date */
+  font-weight: bold;
+  color: #00f;
+}
+
+.calendar tbody .disabled { color: #999; }
+
+.calendar tbody .emptycell { /* Empty cells (the best is to hide them) */
+  visibility: hidden;
+}
+
+.calendar tbody .emptyrow { /* Empty row (some months need less than 6 rows) */
+  display: none;
+}
+
+/* The footer part -- status bar and "Close" button */
+
+.calendar tfoot .footrow { /* The <TR> in footer (only one right now) */
+}
+
+.calendar tfoot .ttip { /* Tooltip (status bar) cell <TD> */
+  background: #f4f0e8;
+  padding: 1px;
+  border: 1px solid #000;
+  background: #848078;
+  color: #fff;
+  text-align: center;
+}
+
+.calendar tfoot .hilite { /* Hover style for buttons in footer */
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+  padding: 1px;
+  background: #e4e0d8;
+}
+
+.calendar tfoot .active { /* Active (pressed) style for buttons in footer */
+  padding: 2px 0px 0px 2px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+}
+
+/* Combo boxes (menus that display months/years for direct selection) */
+
+.calendar .combo {
+  position: absolute;
+  display: none;
+  width: 4em;
+  top: 0px;
+  left: 0px;
+  cursor: default;
+  border-top: 1px solid #fff;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #fff;
+  background: #e4e0d8;
+  font-size: 90%;
+  padding: 1px;
+  z-index: 100;
+}
+
+.calendar .combo .label,
+.calendar .combo .label-IEfix {
+  text-align: center;
+  padding: 1px;
+}
+
+.calendar .combo .label-IEfix {
+  width: 4em;
+}
+
+.calendar .combo .active {
+  background: #c4c0b8;
+  padding: 0px;
+  border-top: 1px solid #000;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  border-left: 1px solid #000;
+}
+
+.calendar .combo .hilite {
+  background: #048;
+  color: #fea;
+}
+
+.calendar td.time {
+  border-top: 1px solid #000;
+  padding: 1px 0px;
+  text-align: center;
+  background-color: #f4f0e8;
+}
+
+.calendar td.time .hour,
+.calendar td.time .minute,
+.calendar td.time .ampm {
+  padding: 0px 3px 0px 4px;
+  border: 1px solid #889;
+  font-weight: bold;
+  background-color: #fff;
+}
+
+.calendar td.time .ampm {
+  text-align: center;
+}
+
+.calendar td.time .colon {
+  padding: 0px 2px 0px 3px;
+  font-weight: bold;
+}
+
+.calendar td.time span.hilite {
+  border-color: #000;
+  background-color: #766;
+  color: #fff;
+}
+
+.calendar td.time span.active {
+  border-color: #f00;
+  background-color: #000;
+  color: #0f0;
+}
+.title{
+    float: left;
+    width: 100px;
+    text-align: right;
+    padding-right: 10px;
+}
+
+fieldset{
+    border: 1px solid;
+    padding: 10px;  
+    margin-bottom: 10px;
+}
+
+legend{
+    display: block;
+    width: auto;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+    border: 0;    
+}
+form {
+	width: auto;
+	min-width: 700px;
+	background: #FFF;
+	margin-bottom: 0px;
+	border-radius:;
+	-moz-border-radius: 10px;
+	padding-left: 200px;
+    padding-right: 200px;
+    -moz-box-shadow: 3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow: 3px 3px 5px 6px #ccc;
+ }
+textarea,input, textbox {
+	border-radius: 5px;
+	border-color: #999;
+	font-family: "Times New Roman", Times, serif;
+	font-size: 10pt;
+}
+select{
+    border-radius: 5px;
+    border-color: #999;
+	font-family: "Times New Roman", Times, serif;
+	font-size: 10pt;
+    
+}
+
+textarea{
+	padding: 5px;
+	width:100%;
+    margin-bottom: 5px;
+    
+}
+/*fixed header*/
+h{
+    color: white;
+	text-align: center;
+	font-size: 12pt;
+	margin-bottom: 5px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    padding: 12px 16px;
+    width: 100%;
+    background-color: slateblue;
+    z-index: 1000;   
+}
+
+label.timestart {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+label.timeend {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+span input{
+    margin: .4rem ;
+}
+.title {
+	font-size: 12pt;
+}
+.clr{
+	clear:both;
+}
+table tr td{
+	padding: 10px;
+}
+table tr:hover{
+	background: #CCC;
+}
+input[readonly=readonly] {
+  background:yellow;
+  color:blue;
+  cursor:default;
+}
+.save, .dontsave, .printform  {
+	cursor: pointer;
+}
+.save:hover, .dontsave:hover, .printform:hover  {
+	background: #FFF;
+}
+/*PROBLEM(S) & FORM(S)*/
+.problems-goals input[type=checkbox] {
+	top: 40px;
+	position: relative;
+	float: left;
+	left: 30px;
+	width: 20px;
+	height: 20px;
+}
+.problems-goals .progo{
+	padding-left: 70px;
+	display: inline-block;
+	min-height: 80px;
+}
+
+/*COLUMNS*/
+li.section_break div {
+	width: 100%;
+    margin: 0px;
+}
+li.section_break div span.columns {
+	width: 30%;
+	display: inline-block;
+	vertical-align: top;
+}
+
+/*WARNINGS*/
+.tp-warning {
+	background: #CCC;
+    width: 50%;
+    text-align: center;
+    margin: 0 auto;
+    border: 5px solid #FFF;
+    border-radius: 10px;
+    padding: 60px 10px;
+    box-shadow: 4px 3px 5px #000;
+    color: #F00;
+    font-weight: bold;
+}
+.tp-alert {
+	width: 60%;
+	padding: 10px;
+	margin: 15px 15px 15px 20px;
+}

@@ -1,0 +1,2 @@
+SELECT en.date, en.encounter AS enencounter, en.facility, en.last_level_billed, en.status, fm.form_id, fm.id, fm.form_name, fm.user, fm.formdir, fm.encounter AS fmencounter, fr.status, fr.servicecode, fr.units, fr.id FROM openemr.form_encounter en JOIN forms AS fm ON fm.encounter = en.encounter JOIN form_psychosocial AS fr ON fr.id = fm.form_id WHERE en.date between '2017-10-10' AND '2017-10-14' AND fm.formdir = 'psychosocial'
+

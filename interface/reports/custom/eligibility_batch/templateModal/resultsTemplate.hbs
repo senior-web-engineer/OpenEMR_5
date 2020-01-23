@@ -1,0 +1,250 @@
+<div>
+    <!-- tab container -->
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#formatted" aria-controls="formatted" role="tab" data-toggle="tab">Formatted</a>
+        </li>
+        <li role="presentation">
+            <a href="#rawDisplay" aria-controls="rawDisplay" role="tab" data-toggle="tab">Raw</a>
+        </li>
+    </ul>
+
+    <!-- tab panes -->
+    <div class="tab-content">
+
+        <div role="tabpanel" class="tab-pane active" id="formatted">
+
+                <div class="row">
+                    <nav class="col-sm-3">
+                        <ul class="nav nav-stacked" data-spy="affix" data-offset-top="20">
+                            <li><a href="#section_request">Request</a></li>
+                            <li><a href="#section_subscriber">Subscriber</a></li>
+                            <li><a href="#section_payer">Payer</a></li>
+                            <li><a href="#section_provider">Provider</a></li>
+                            <li><a href="#section_coverage">Coverage</a></li>
+                            <li><a href="#section_coinsurance">CoInsurance</a></li>
+                            <li><a href="#section_copay">CoPay</a></li>
+                            <li><a href="#section_pharmacy">Pharmaacy</a></li>
+                            <li><a href="#section_deductibles">Deductibles</a></li>
+                            <li><a href="#section_limitations">Limitations</a></li>
+                            <li><a href="#section_summary">Summary</a></li>
+                            <li><a href="#section_entities">Entities</a></li>
+                        </ul>
+                    </nav>
+
+                    <div class="col-sm-9">
+                        <h3 id="section_request">Request</h3>
+                        <div>
+                            {{#with data}}
+                            <b>Trading Parter: </b>{{fProper trading_partner_id}}<br>
+                            <b>Valid Request: </b>{{valid_request}}<br>
+                            <b>Service Types:</b> {{#each service_types as |x|}}{{fProper x}}, {{/each}}<br>
+                            <b>Service Types Codes: </b>{{#each service_type_codes as |x|}}{{x}}, {{/each}}<br>
+                            {{/with}}
+                        </div>
+
+                        <h3 id="section_subscriber">Subscriber</h3>
+                        <div class="planDeets">
+                            {{#with data.subscriber}}
+                            <b>ID: </b>{{id}}
+                            <b>Last Name: </b>{{last_name}},
+                            <b>First Name: </b>{{first_name}}
+                            <b>DOB: </b>{{birth_date}}
+                            <b>Gender: </b>{{fProper gender}}
+                            {{/with}}
+                        </div>
+
+                        <h3 id="section_payer">Payer</h3>
+                        <div class="planDeets">
+                            {{#with data.payer}}
+                            <b>Name: </b>{{name}}
+                            {{/with}}
+                        </div>
+
+                        <h3 id="section_provider">Provider</h3>
+                        <div class="planDeets">
+                            {{#with data.provider}}
+                            <b>Organization: </b>{{organization_name}}
+                            {{/with}}
+                        </div>
+
+                        <h3 id="section_coverage">Coverage</h3>
+                        <div class="planDeets">
+                            {{#with data.coverage}}
+                            <b>Plan Date: </b>{{paln_date}}
+                            <b>Plan Begin Date:</b> {{ plan_begin_date }}
+                            <b>Plan End Date:</b> {{ plan_end_date }}
+                            <b>Service date:</b> {{ service_date }}<br />
+
+                            <b>Insurance:</b> {{fProper insurance_type}}
+                            <b>Plan:</b> {{plan_description}}
+                            <b>Level:</b> {{level}}
+                            <b>Active:</b> {{active}}<br />
+                            <b>Service Types:</b> {{#each service_types as |x|}}{{fProper x}}, {{/each}}<br>
+                            <b>Service Types Codes: </b>{{#each service_type_codes as |x|}}{{x}}, {{/each}}<br>
+                            {{/with}}
+                        </div>
+
+                        <h3 id="section_coinsurance">CoInsurance</h3>
+                        <div class="">
+                            {{#each data.coverage.coinsurance}}
+                            <div class="planDeets">
+                                <b>Plan:</b> {{plan_description}}<br>
+                                <b>Service Types:</b> {{#each service_types as |x|}}{{fProper x}}, {{/each}}<br>
+                                <b>Service Types Codes: </b>{{#each service_type_codes as |x|}}{{x}}, {{/each}}<br>
+                                <b>Benefit percent:</b> {{benefit_percent}}
+                                <b>Coverage Level:</b> {{fProper coverage_level }}<br>
+                            </div>
+                            {{/each}}
+                        </div>
+
+                        <h3 id="section_copay">CoPay</h3>
+                        <div>
+                            {{#each data.coverage.copay}}
+                            <div class="planDeets">
+                                <b>Plan: </b>{{plan_description}}<br>
+                                <b>Service Types:</b> {{#each service_types as |x|}}{{fProper x}}, {{/each}}<br>
+                                <b>Service Types Codes: </b>{{#each service_type_codes as |x|}}{{x}}, {{/each}}<br>
+                                <b>Coverage Level:</b> {{fProper coverage_level}}
+                                <b>Copayment Amount:</b> {{fCurrency copayment.amount }}<br>
+                            </div>
+                            {{/each}}
+                        </div>
+
+                        <h3 id="section_pharmacy">Pharmacy</h3>
+                        <div>
+                            {{#with data.pharmacy}}
+                            <div class="planDeets">
+                                <b>Eligible: </b>{{is_eligible}}<br>
+                                {{#each copay}}
+                                <b>Copayment Amount:</b> {{fCurrency copayment.amount }} {{fProper type}}<br>
+                                {{/each}}
+                            </div>
+                            {{/with}}
+                        </div>
+
+                        <h3 id="section_deductibles">Deductibles</h3>
+                        <div>
+                            {{#each data.coverage.deductibles}}
+                            <div class="planDeets">
+                                <b>Plan: </b>{{plan_description}}<br>
+                                <b>Service Types:</b> {{#each service_types as |x|}}{{fProper x}}, {{/each}}<br>
+                                <b>Service Types Codes: </b>{{#each service_type_codes as |x|}}{{x}}, {{/each}}<br>
+                                <b>Plan Begin Date:</b> {{ plan_begin_date }}
+                                <b>Plan End Date:</b> {{ plan_end_date }}
+                                <b>Time Period:</b> {{fProper time_period }} <br>
+                                <b>Coverage Level:</b> {{fProper coverage_level}}
+                                <b>Benefit Amount:</b> {{fCurrency benefit_amount.amount }}<br>
+                            </div>
+                            {{/each}}
+                        </div>
+
+                        <h3 id="section_limitations">Limitations</h3>
+                        <div>
+                            {{#each data.coverage.deductibles}}
+                            <div class="planDeets">
+                                <b>Plan: </b>{{plan_description}}<br>
+                                <b>Service Types:</b> {{#each service_types as |x|}}{{fProper x}}, {{/each}}<br>
+                                <b>Service Types Codes: </b>{{#each service_type_codes as |x|}}{{x}}, {{/each}}<br>
+                                <b>Service Begin Date:</b> {{ service_date }}
+                                <b>Service End Date:</b> {{ service_end_date }}
+                                <b>Time Period Qualifier:</b> {{fProper time_period_qualifier }} <br>
+                                <b>Description:</b> {{Description}}
+                                <b>Insurance Type:</b> {{fProper insurance_type }}<br>
+                                <b>Coverage Level:</b> {{fProper coverage_level}}
+                                <b>Quantity </b> {{quantity}} {{ quantity_qualifier}}
+                                <b>Benefit Amount:</b> {{fCurrency benefit_amount.amount }}<br>
+                            </div>
+                            {{/each}}
+                        </div>
+
+                        <h3 id="section_summary">Summary</h3>
+                        <div>
+                            {{#with data.summary}}
+                            <div class="planDeets">
+                                <table class='summaryTbl'>
+                                    <thead>
+                                        <th></th>
+                                        <th></th>
+                                        <th>In Network</th>
+                                        <th>Out of Network</th>
+                                    </thead>
+                                    <tbody>
+                                        {{#with deductible.individual}}
+                                        <tr>
+                                            <td>Deductible</td>
+                                            <td>Limit</td>
+                                            <td>{{fCurrency in_network.limit.amount }}</td>
+                                            <td>{{fCurrency out_of_network.limit.amount }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Applied</td>
+                                            <td>{{fCurrency in_network.applied.amount }}</td>
+                                            <td>{{fCurrency out_of_network.applied.amount }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Remaining</td>
+                                            <td>{{fCurrency in_network.remaining.amount }}</td>
+                                            <td>{{fCurrency out_of_network.remaining.amount }}</td>
+                                        </tr>
+                                        {{/with}}
+                                        {{#with out_of_pocket.individual}}
+                                        <tr>
+                                            <td>Out of Pocket</td>
+                                            <td>Limit</td>
+                                            <td>{{fCurrency in_network.limit.amount }}</td>
+                                            <td>{{fCurrency out_of_network.limit.amount }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Applied</td>
+                                            <td>{{fCurrency in_network.applied.amount }}</td>
+                                            <td>{{fCurrency out_of_network.applied.amount }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>Remaining</td>
+                                            <td>{{fCurrency in_network.remaining.amount }}</td>
+                                            <td>{{fCurrency out_of_network.remaining.amount }}</td>
+                                        </tr>
+                                        {{/with}}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {{/with}}
+                        </div>
+
+                        <h3 id="section_entities">Benefit Related Entities</h3>
+                        <div>
+                            {{#each data.benefit_related_entities}}
+                            <div class="planDeets">
+                                <b>Entity Type:</b> {{fProper entity_type }}
+                                <b>Entity ID Code: </b>{{fProper entity_identifier_code}}
+                                <b>Organization: </b>{{organization_name}}<br>
+                                <b>Address:</b> {{address.city}}, {{address.state}} {{address.zipcode}}<br>
+                                <b>Contacts:</b> {{#each phone as |x|}}{{x}} {{/each}}<br>
+                                <b>Info:</b> {{fProper eligibility_or_benefit_information }} <br>
+                                <b>Service Types:</b> {{#each service_types as |x|}}{{x}}, {{/each}}<br>
+                                <b>Service Types Codes: </b>{{#each service_type_codes as |x|}}{{x}}, {{/each}}<br>
+                                <b>Benefit Amount:</b> {{fCurrency benefit_amount.amount }}<br>
+                                <b>Coverage Level:</b> {{fProper coverage_level}}
+                            </div>
+                            {{/each}}
+                        </div>
+
+                    </div><!-- end of 2nd col -->
+                </div>
+
+        </div><!-- end of panel 1 home -->
+
+        <div role="tabpanel" class="tab-pane" id="rawDisplay">
+            {{jsonBeauty data}}
+        </div>
+
+    </div><!-- tab panes -->
+
+</div><!-- tab container -->
