@@ -602,6 +602,7 @@ if (empty($collectthis)) {
                         "pc_title = '" . add_escape_custom($_POST['form_title']) . "', " .
                         "pc_time = NOW(), " .
                         "pc_hometext = '" . add_escape_custom($_POST['form_comments']) . "', " .
+                        "pc_roomlink = '" . add_escape_custom($_POST['form_roomlink']) . "', " .
                         "pc_room = '" . add_escape_custom($_POST['form_room']) . "', " .
                         "pc_informant = '" . add_escape_custom($_SESSION['authUserID']) . "', " .
                         "pc_eventDate = '" . add_escape_custom($event_date) . "', " .
@@ -698,6 +699,7 @@ if (empty($collectthis)) {
                     "pc_title = '" . add_escape_custom($_POST['form_title']) . "', " .
                     "pc_time = NOW(), " .
                     "pc_hometext = '" . add_escape_custom($_POST['form_comments']) . "', " .
+                    "pc_roomlink = '" . add_escape_custom($_POST['form_roomlink']) . "', " .
                     "pc_room = '" . add_escape_custom($_POST['form_room']) . "', " .
                     "pc_informant = '" . add_escape_custom($_SESSION['authUserID']) . "', " .
                     "pc_eventDate = '" . add_escape_custom($event_date) . "', " .
@@ -877,6 +879,7 @@ if (empty($collectthis)) {
     $patienttitle = array();
     $pcroom = "";
     $hometext = "";
+    $roomlink = "";
     $row = array();
     $informant = "";
     $groupid = '';
@@ -935,6 +938,7 @@ if (empty($collectthis)) {
         if (substr($hometext, 0, 6) == ':text:') {
             $hometext = substr($hometext, 6);
         }
+        $roomlink = $row['pc_roomlink'];
     } else {
           // a NEW event
           $eventstartdate = $date; // for repeating event stuff - JRM Oct-08
@@ -1922,7 +1926,27 @@ if ($repeatexdate != "") {
    <b><?php echo xlt('Comments'); ?>:</b>
   </td>
   <td colspan='4' nowrap>
-   <input class='input-sm' type='text' size='40' name='form_comments' style='width:100%' value='<?php echo attr($hometext); ?>' title='<?php echo xla('Optional information about this event');?>' />
+   <input class='form-control' type='text' size='40' name='form_comments' style='width:100%' value='<?php echo attr($hometext); ?>' title='<?php echo xla('Optional information about this event');?>' />
+  </td>
+ </tr>
+ <tr>
+  <td nowrap>
+   <b><?php echo xlt('Roomlink'); ?>:</b>
+  </td>
+  <td colspan='4' nowrap>
+    <select class="form-control" name="form_roomlink" style="width:100%" size="1">
+        <option value=""></option>
+    <?php
+        $query = "SELECT * FROM rooms WHERE active = '1'";
+        $res = sqlStatement($query);
+        for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
+    ?>
+        <option value="<?php echo $row['room_link'];?>" <?php echo (attr($roomlink) == $row['room_link'])?'selected':''; ?>><?php echo $row['room_link']; ?></option>
+    <?php
+        }
+    ?>
+    </select>
+   <!--input class='input-sm' type='text' size='128' name='form_roomlink' style='width:100%' value='<?php echo attr($roomlink); ?>' title='<?php echo xla('Optional information about this event');?>' /-->
   </td>
  </tr>
 

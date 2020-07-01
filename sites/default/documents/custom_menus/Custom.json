@@ -1989,6 +1989,13 @@
     ]
   },
   {
+        "label": "Rooms",
+        "menu_id": "rooms",
+        "url": "/interface/rooms/room_list.php",
+        "target": "room",
+        "requirement": 0
+    },
+    {
     "label": "Popups",
     "menu_id": "popup",
     "children": [

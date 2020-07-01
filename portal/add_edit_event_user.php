@@ -286,7 +286,7 @@ if ($_POST['form_action'] == "save") {
             $r2 = array_diff($providers_new, $providers_current);
             if (count($r2)) {
                 foreach ($r2 as $to_be_inserted) {
-                    sqlStatement("INSERT INTO openemr_postcalendar_events ( pc_catid, pc_multiple, pc_aid, pc_pid, pc_title, pc_time, pc_hometext, pc_informant, pc_eventDate, pc_endDate, pc_duration, pc_recurrtype, pc_recurrspec, pc_startTime, pc_endTime, pc_alldayevent, pc_apptstatus, pc_prefcatid, pc_location, pc_eventstatus, pc_sharing, pc_facility)
+                    sqlStatement("INSERT INTO openemr_postcalendar_events ( pc_catid, pc_multiple, pc_aid, pc_pid, pc_title, pc_time, pc_hometext, pc_roomlink, pc_informant, pc_eventDate, pc_endDate, pc_duration, pc_recurrtype, pc_recurrspec, pc_startTime, pc_endTime, pc_alldayevent, pc_apptstatus, pc_prefcatid, pc_location, pc_eventstatus, pc_sharing, pc_facility)
             VALUES ( " .
                     "'" . add_escape_custom($_POST['form_category']) . "', " .
                     "'" . add_escape_custom($row['pc_multiple']) . "', " .
@@ -295,6 +295,7 @@ if ($_POST['form_action'] == "save") {
                     "'" . add_escape_custom($_POST['form_title']) . "', " .
                     "NOW(), " .
                     "'" . add_escape_custom($_POST['form_comments']) . "', " .
+                    "'" . add_escape_custom($_POST['form_roomlink']) . "', " .
                     "'" . add_escape_custom($_SESSION['providerId']) . "', " .
                     "'" . add_escape_custom($event_date) . "', " .
                     "'" . add_escape_custom(fixDate($_POST['form_enddate'])) . "', " .
@@ -322,6 +323,7 @@ if ($_POST['form_action'] == "save") {
                 "pc_title = '" . add_escape_custom($_POST['form_title']) . "', " .
                 "pc_time = NOW(), " .
                 "pc_hometext = '" . add_escape_custom($_POST['form_comments']) . "', " .
+                "pc_roomlink = '" . add_escape_custom($_POST['form_roomlink']) . "', " .
                 "pc_informant = '" . add_escape_custom($_SESSION['providerId']) . "', " .
                 "pc_eventDate = '" . add_escape_custom($event_date) . "', " .
                 "pc_endDate = '" . add_escape_custom(fixDate($_POST['form_enddate'])) . "', " .
@@ -355,6 +357,7 @@ if ($_POST['form_action'] == "save") {
             "pc_title = '" . add_escape_custom($_POST['form_title']) . "', " .
             "pc_time = NOW(), " .
             "pc_hometext = '" . add_escape_custom($_POST['form_comments']) . "', " .
+            "pc_roomlink = '" . add_escape_custom($_POST['form_roomlink']) . "', " .
             "pc_informant = '" . add_escape_custom($_SESSION['providerId']) . "', " .
             "pc_eventDate = '" . add_escape_custom($event_date) . "', " .
             "pc_endDate = '" . add_escape_custom(fixDate($_POST['form_enddate'])) . "', " .
@@ -394,7 +397,7 @@ if ($_POST['form_action'] == "save") {
 
             foreach ($_POST['form_provider_ae'] as $provider) {
                 sqlStatement("INSERT INTO openemr_postcalendar_events ( " .
-                "pc_catid, pc_multiple, pc_aid, pc_pid, pc_title, pc_time, pc_hometext, " .
+                "pc_catid, pc_multiple, pc_aid, pc_pid, pc_title, pc_time, pc_hometext,  pc_roomlink," .
                 "pc_informant, pc_eventDate, pc_endDate, pc_duration, pc_recurrtype, " .
                 "pc_recurrspec, pc_startTime, pc_endTime, pc_alldayevent, " .
                 "pc_apptstatus, pc_prefcatid, pc_location, pc_eventstatus, pc_sharing, pc_facility " .
@@ -406,6 +409,7 @@ if ($_POST['form_action'] == "save") {
                 "'" . add_escape_custom($_POST['form_title']) . "', " .
                 "NOW(), " .
                 "'" . add_escape_custom($_POST['form_comments']) . "', " .
+                "'" . add_escape_custom($_POST['form_roomlink']) . "', " .
                 "'" . add_escape_custom($_SESSION['providerId']) . "', " .
                 "'" . add_escape_custom($event_date) . "', " .
                 "'" . add_escape_custom(fixDate($_POST['form_enddate'])) . "', " .
@@ -425,7 +429,7 @@ if ($_POST['form_action'] == "save") {
             $_POST['form_apptstatus'] = '^';
             $insert = true;
             sqlStatement("INSERT INTO openemr_postcalendar_events ( " .
-            "pc_catid, pc_aid, pc_pid, pc_title, pc_time, pc_hometext, " .
+            "pc_catid, pc_aid, pc_pid, pc_title, pc_time, pc_hometext, pc_roomlink," .
             "pc_informant, pc_eventDate, pc_endDate, pc_duration, pc_recurrtype, " .
             "pc_recurrspec, pc_startTime, pc_endTime, pc_alldayevent, " .
             "pc_apptstatus, pc_prefcatid, pc_location, pc_eventstatus, pc_sharing, pc_facility " .
@@ -436,6 +440,7 @@ if ($_POST['form_action'] == "save") {
             "'" . add_escape_custom($_POST['form_title']) . "', " .
             "NOW(), " .
             "'" . add_escape_custom($_POST['form_comments']) . "', " .
+            "'" . add_escape_custom($_POST['form_roomlink']) . "', " .
             "'" . add_escape_custom($_SESSION['providerId']) . "', " .
             "'" . add_escape_custom($event_date) . "', " .
             "'" . add_escape_custom(fixDate($_POST['form_enddate'])) . "', " .
@@ -741,6 +746,14 @@ if ($starttimeh >= 12) { // p.m. starts at noon and not 12:01
                 </td>
                 <td style='padding:0px 5px 5px 0' colspan='4' nowrap>
                     <input class="form-control" type='text' size='40' name='form_comments' style='width:100%' value='<?php echo attr($hometext); ?>' title='<?php echo xla('Optional information about this event'); ?>' />
+                </td>
+            </tr>
+            <tr>
+                <td nowrap>
+                    <b><?php echo xlt('Roomlink'); ?>:</b>
+                </td>
+                <td style='padding:0px 5px 5px 0' colspan='4' nowrap>
+                    <input class="form-control" type='text' size='128' name='form_roomlink' style='width:100%' value='<?php echo attr($roomlink); ?>' title='<?php echo xla('Optional information about this event'); ?>' />
                 </td>
             </tr>
         </table>

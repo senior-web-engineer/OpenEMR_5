@@ -133,4 +133,15 @@ function checkAlphaNumericExtended(eleName,eleVal)
         m += '<?php echo xl("Invalid character in")." " ?>'+eleName.toUpperCase()+"\n";
     return m;
 }
+
+function checkWebUrl(eleName, eleVal)
+{
+    var regE = /\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i;
+    var m = '';
+    eleName=eleName.replace('form_','');
+    eleName=eleName.replace('_',' ');
+    if(regE.test(eleVal)==false)
+        m += '<?php echo xl("Invalid link")." " ?>'+eleName.toUpperCase()+"\n";
+    return m;
+}
 </script>

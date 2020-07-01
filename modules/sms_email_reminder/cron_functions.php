@@ -361,6 +361,11 @@ function cron_setmessage($prow, $db_email_msg)
     $find_array = array("***NAME***","***PROVIDER***","***DATE***","***STARTTIME***","***ENDTIME***");
     $replare_array = array($NAME,$PROVIDER,$DATE,$STARTTIME,$ENDTIME);
     $message = str_replace($find_array, $replare_array, $db_email_msg['message']);
+
+    if (strpos(strtolower($prow['pc_title']), 'TeleMedicine'))
+        return $message . '\n' . $prow['pc_roomlink'];
+    if (strpos(strtolower($prow['pc_title']), 'TeleHealth'))
+        return $message . '\n' . $prow['pc_roomlink'];
     // larry :: debug
     //echo "DEBUG :2: msg=".$message."\n";
 
