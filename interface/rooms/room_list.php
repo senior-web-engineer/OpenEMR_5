@@ -23,9 +23,11 @@ if (!empty($_GET)) {
     }
 }
 
-if (!acl_check('admin', 'users')) {
+/*
+if (!acl_check('admin', 'practice')) {
     die(xlt('Access denied'));
 }
+*/
 
 if (isset($_POST["mode"])) {
     if ($_POST["mode"] == "new_room") {
@@ -107,11 +109,15 @@ if (isset($_REQUEST["mode"])) {
                                 <th><?php echo xlt('Real Name'); ?></th>
                                 <th><?php echo xlt('Platform'); ?></th>
                                 <th><?php echo xlt('Room Link'); ?></th>
+                                <th><?php echo xlt('Created Time'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php
-                            $query = "SELECT rooms.id, users.username, users.fname, users.lname, rooms.platform, rooms.room_link FROM rooms INNER JOIN users ON rooms.user_id=users.id WHERE rooms.active = '1'";
+                            if ($_SESSION['authUserID'] == 1)
+                                $query = "SELECT rooms.id, users.username, users.fname, users.lname, rooms.platform, rooms.room_link, rooms.created_time FROM rooms INNER JOIN users ON rooms.user_id=users.id WHERE rooms.active = '1' ORDER BY created_time DESC";
+                            else
+                                $query = "SELECT rooms.id, users.username, users.fname, users.lname, rooms.platform, rooms.room_link, rooms.created_time FROM rooms INNER JOIN users ON rooms.user_id=users.id WHERE user_id=".$_SESSION['authUserID']." AND rooms.active = '1' ORDER BY created_time DESC";
                             $res = sqlStatement($query);
                             for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
                         ?>
@@ -122,6 +128,7 @@ if (isset($_REQUEST["mode"])) {
                                 <td><?php echo text($row['fname']) . ' ' . text($row['lname']); ?></td>
                                 <td><?php echo text($row['platform']); ?></td>
                                 <td><?php echo $row['room_link']; ?></td>
+                                <td><?php echo $row['created_time']; ?></td>
                             </tr>
                         <?php
                             }

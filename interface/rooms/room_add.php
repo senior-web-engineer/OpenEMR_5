@@ -13,10 +13,11 @@ use OpenEMR\Core\Header;
 use OpenEMR\Menu\MainMenuRole;
 use OpenEMR\Menu\PatientMenuRole;
 
-if (!acl_check('admin', 'users')) {
+/*
+if (!acl_check('admin', 'practice')) {
     exit();
 }
-
+*/
 $room_userid = "";
 $room_platform = "";
 $room_link = "";
@@ -117,7 +118,14 @@ $alertmsg = '';
                                     <td style="width:220px;">
                                         <select name="user_id" id="user_id" class="form-control" size="1" style="width:120px;">
                                         <?php
-                                            $query = "SELECT * FROM users WHERE active = '1'";
+                                            if ($_SESSION['authUserID'] == 1)
+                                            {
+                                                $query = "SELECT * FROM users WHERE active = '1'";
+                                            }
+                                            else
+                                            {
+                                                $query = "SELECT * FROM users WHERE id=".$_SESSION['authUserID']." AND active = '1'";
+                                            }
                                             $res = sqlStatement($query);
                                             for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
                                         ?>
@@ -134,6 +142,7 @@ $alertmsg = '';
                                         <select name="platform" class="form-control" size="1" style="width:120px;">
                                             <option value="Terms" <?php echo ($room_platform == 'Terms')?'selected':''; ?>>Terms</option>
                                             <option value="Zoom"<?php echo ($room_platform == 'Zoom')?'selected':''; ?>>Zoom</option>
+                                            <option value="WebRTC"<?php echo ($room_platform == 'WebRTC')?'selected':''; ?>>WebRTC</option>
                                         </select>
                                     </td>
                                 </tr>
