@@ -127,7 +127,7 @@ if (isset($_REQUEST["mode"])) {
                                 "' class='medium_modal' onclick='top.restoreSession()'>" . text($row{"username"}) . "</a></b>";?></td>
                                 <td><?php echo text($row['fname']) . ' ' . text($row['lname']); ?></td>
                                 <td><?php echo text($row['platform']); ?></td>
-                                <td><?php echo $row['room_link']; ?></td>
+                                <td><a href="<?php echo $row['room_link']; ?>"><?php echo $row['room_link']; ?></a></td>
                                 <td><?php echo $row['created_time']; ?></td>
                             </tr>
                         <?php
