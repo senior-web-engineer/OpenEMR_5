@@ -23,38 +23,37 @@ if (!empty($_GET)) {
     }
 }
 
-/*
-if (!acl_check('admin', 'practice')) {
+
+if (!acl_check('admin', 'super')) {
     die(xlt('Access denied'));
 }
-*/
+
 
 if (isset($_POST["mode"])) {
-    if ($_POST["mode"] == "new_room") {
+    if ($_POST["mode"] == "new_platform") {
         sqlStatement(
-            "INSERT INTO `rooms` SET user_id = ?, platform = ?, room_link = ?",
+            "INSERT INTO `room_platform` SET platform = ?, priority = ?",
             array(
-                trim((isset($_POST['user_id']) ? $_POST['user_id'] : '')),
                 trim((isset($_POST['platform']) ? $_POST['platform'] : '')),
-                trim((isset($_POST['roomlink']) ? $_POST['roomlink'] : ''))
+                0,
             )
         );
     }
 
-    if ($_POST["mode"] == "edit_room") {
+    if ($_POST["mode"] == "edit_platform") {
         sqlStatement(
-            "UPDATE `rooms` set platform = ?, room_link = ? WHERE id = ?",
+            "UPDATE `room_platform` set platform = ?, priority = ? WHERE id = ?",
             array(
                 trim((isset($_POST['platform']) ? $_POST['platform'] : '')),
-                trim((isset($_POST['roomlink']) ? $_POST['roomlink'] : '')),
+                0,
                 trim((isset($_POST['id']) ? $_POST['id'] : ''))
             )
         );
     }
 
-    if ($_POST['mode'] == 'delete_room') {
+    if ($_POST['mode'] == 'delete_platform') {
         sqlStatement(
-            "DELETE FROM rooms WHERE id = ?",
+            "DELETE FROM `room_platform` WHERE id = ?",
             array(
                 trim((isset($_POST['id']) ? $_POST['id'] : ''))
             )
@@ -68,7 +67,7 @@ if (isset($_REQUEST["mode"])) {
 ?>
 <html>
     <head>
-        <title><?php echo xlt('Rooms / Rooms');?></title>
+        <title><?php echo xlt('Rooms / Platform');?></title>
         <?php Header::setupHeader(['common','jquery-ui']); ?>
         <script type="text/javascript">
             $(function(){
@@ -82,11 +81,6 @@ if (isset($_REQUEST["mode"])) {
                 });
 
             });
-
-            function open_room(room_link){
-                location.target = '_self';
-                location.href=room_link;
-            }
         </script>
     </head>
     <body class="body_top">
@@ -94,13 +88,13 @@ if (isset($_REQUEST["mode"])) {
             <div class="row">
                 <div class="col-xs-12">
                     <div class="page-title">
-                        <h2><?php echo xlt('Rooms');?></h2>
+                        <h2><?php echo xlt('Platform');?></h2>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <a href="room_add.php" class="medium_modal btn btn-default btn-add"><?php echo xlt('Add Room'); ?></a>
+                    <a href="./platform_add.php" class="medium_modal btn btn-default btn-add"><?php echo xlt('Add Platform'); ?></a>
                 </div>
             </div>
             <div class="row">
@@ -110,29 +104,26 @@ if (isset($_REQUEST["mode"])) {
                         <thead>
                             <tr>
                                 <th><?php echo xlt('Id'); ?></th>
-                                <th><?php echo xlt('Username'); ?></th>
-                                <th><?php echo xlt('Real Name'); ?></th>
                                 <th><?php echo xlt('Platform'); ?></th>
-                                <th><?php echo xlt('Room Link'); ?></th>
+                                <th><?php echo xlt('Priority'); ?></th>
                                 <th><?php echo xlt('Created Time'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php
-                            if ($_SESSION['authUserID'] == 1)
-                                $query = "SELECT rooms.id, users.username, users.fname, users.lname, rooms.platform, rooms.room_link, rooms.created_time FROM rooms INNER JOIN users ON rooms.user_id=users.id WHERE rooms.active = '1' ORDER BY created_time DESC";
-                            else
-                                $query = "SELECT rooms.id, users.username, users.fname, users.lname, rooms.platform, rooms.room_link, rooms.created_time FROM rooms INNER JOIN users ON rooms.user_id=users.id WHERE user_id=".$_SESSION['authUserID']." AND rooms.active = '1' ORDER BY created_time DESC";
+                            $query = "SELECT * FROM room_platform ORDER BY priority ASC";
+
                             $res = sqlStatement($query);
                             for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
                         ?>
                             <tr>
                                 <td><?php echo ($iter + 1); ?></td>
-                                <td><?php echo "<b><a href='room_add.php?id=" . attr_url($row{"id"}) . "&csrf_token_form=" . attr_url(CsrfUtils::collectCsrfToken()) .
-                                "' class='medium_modal' onclick='top.restoreSession()'>" . text($row{"username"}) . "</a></b>";?></td>
-                                <td><?php echo text($row['fname']) . ' ' . text($row['lname']); ?></td>
-                                <td><?php echo text($row['platform']); ?></td>
-                                <td><a href="#" onclick="open_room('<?php echo $row['room_link'] ?>')"><?php echo $row['room_link']; ?></a></td>
+                                <td><?php echo "<b><a href='platform_add.php?id=" . attr_url($row{"id"}) . "&csrf_token_form=" . attr_url(CsrfUtils::collectCsrfToken()) .
+                                "' class='medium_modal' onclick='top.restoreSession()'>" . text($row{"platform"}) . "</a></b>";?></td>
+                                <td>
+                                    <a href="#" onclick="priority_down('<?php echo attr_url($row{"id"}) ?>')">Down</a>
+                                    <a href="#" onclick="priority_up('<?php echo attr_url($row{"id"}) ?>')">Up</a>
+                                </td>
                                 <td><?php echo $row['created_time']; ?></td>
                             </tr>
                         <?php

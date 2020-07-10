@@ -23,14 +23,12 @@ $room_platform = "";
 $room_link = "";
 if (isset($_GET['id']))
 {
-    $res = sqlStatement("SELECT * from rooms where id=?", array($_GET["id"]));
+    $res = sqlStatement("SELECT * from room_platform where id=?", array($_GET["id"]));
     for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
                     $result[$iter] = $row;
     }
-    $room = $result[0];
-    $room_userid = $room['user_id'];
-    $room_platform = $room['platform'];
-    $room_link = $room['room_link'];
+    $platforminfo = $result[0];
+    $platform = $platforminfo['platform'];
 }
 
 $alertmsg = '';
@@ -46,16 +44,15 @@ $alertmsg = '';
                 alertMsg='';
 
                 let mode = $("#mode").val();
-                if (mode != 'delete_room'){
+                if (mode != 'delete_platform'){
                     f=document.forms[0];
                     for(i=0;i<f.length;i++) {
                         if(f[i].type=='text') {
-                            if (f[i].name == 'roomlink') {
+                            if (f[i].name == 'platform') {
                                 if (f[i].value == '') {
-                                    alertMsg += '<?php echo xl("Invalid link")." " ?>'+'roomlink'.toUpperCase()+"\n";
+                                    alertMsg += '<?php echo xl("Invalid")." " ?>'+'platform'+"\n";
                                 } else {
-                                    alertMsg += checkLength('roomlink', f[i].value,512);
-                                    alertMsg += checkWebUrl('roomlink', f[i].value);
+                                    alertMsg += checkLength('platform', f[i].value,32);
                                 }
                             }
                         }
@@ -67,9 +64,9 @@ $alertmsg = '';
                     }
                 }
 
-                let post_url = $("#new_room").attr("action");
-                let request_method = $("#new_room").attr("method");
-                let form_data = $("#new_room").serialize();
+                let post_url = $("#new_platform").attr("action");
+                let request_method = $("#new_platform").attr("method");
+                let form_data = $("#new_platform").serialize();
 
                 $.ajax({
                     url: post_url,
@@ -88,7 +85,7 @@ $alertmsg = '';
 
             $(function(){
                 $("#delete").click(function(){
-                    $("#mode").val('delete_room');
+                    $("#mode").val('delete_platform');
                     submitform();
                 });
                 $("#cancel").click(function() {
@@ -101,12 +98,12 @@ $alertmsg = '';
         <div class="container">
             <table>
                 <tr>
-                    <td><span class="title"><?php echo xlt('Add Room'); ?></span>&nbsp;</td>
+                    <td><span class="title"><?php echo (isset($_GET['id']))?xlt('Add Platform'):xlt('Edit Platform'); ?></span>&nbsp;</td>
                 </tr>
             </table>
-            <form name='new_room' id="new_room" method='post' action="room_list.php">
+            <form name='new_platform' id="new_platform" method='post' action="platform_list.php">
                 <input type="hidden" name="csrf_token_form" value="<?php echo attr(CsrfUtils::collectCsrfToken()); ?>" />
-                <input type='hidden' name='mode' id='mode' value='<?php echo (attr($_GET["id"]))?'edit_room':'new_room'; ?>'>
+                <input type='hidden' name='mode' id='mode' value='<?php echo (attr($_GET["id"]))?'edit_platform':'new_platform'; ?>'>
                 <INPUT TYPE="hidden" NAME="id" VALUE="<?php echo attr($_GET["id"]); ?>">
                 <table border=0>
                     <tr>
@@ -114,42 +111,9 @@ $alertmsg = '';
                             <span class="bold">&nbsp;</span>
                             <table border=0 cellpadding=0 cellspacing=0 style="width:600px;">
                                 <tr>
-                                    <td style="width:150px;"><span class="text"><?php echo xlt('Username'); ?>: </span></td>
-                                    <td style="width:220px;">
-                                        <select name="user_id" id="user_id" class="form-control" size="1" style="width:120px;">
-                                        <?php
-                                            if ($_SESSION['authUserID'] == 1)
-                                            {
-                                                $query = "SELECT * FROM users WHERE active = '1'";
-                                            }
-                                            else
-                                            {
-                                                $query = "SELECT * FROM users WHERE id=".$_SESSION['authUserID']." AND active = '1'";
-                                            }
-                                            $res = sqlStatement($query);
-                                            for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
-                                        ?>
-                                            <option value="<?php echo $row['id']; ?>" <?php echo ($room_userid == $row['id'])?'selected':''; ?>><?php echo $row['fname'] . ' ' . $row['lname']; ?></option>
-                                        <?php
-                                            }
-                                        ?>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
                                     <td style="width:150px;"><span class="text"><?php echo xlt('Platform'); ?>: </span></td>
                                     <td style="width:220px;">
-                                        <select name="platform" class="form-control" size="1" style="width:120px;">
-                                            <option value="Terms" <?php echo ($room_platform == 'Terms')?'selected':''; ?>>Terms</option>
-                                            <option value="Zoom"<?php echo ($room_platform == 'Zoom')?'selected':''; ?>>Zoom</option>
-                                            <option value="WebRTC"<?php echo ($room_platform == 'WebRTC')?'selected':''; ?>>WebRTC</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width:150px;"><span class="text"><?php echo xlt('Room Link'); ?>: </span></td>
-                                    <td style="width:220px;">
-                                        <input type="text" name="roomlink" class="form-control" value="<?php echo $room_link; ?>">
+                                        <input type="text" name="platform" class="form-control" value="<?php echo $platform; ?>">
                                     </td>
                                 </tr>
                             </table>

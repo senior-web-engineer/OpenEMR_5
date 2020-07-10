@@ -1963,12 +1963,35 @@
     {
         "label": "Rooms",
         "menu_id": "rooms",
-        "url": "/interface/rooms/room_list.php",
         "target": "room",
         "requirement": 0,
+        "children": [{
+                "label": "Platform",
+                "menu_id": "Rooms:Platform",
+                "url": "/interface/rooms/platform_list.php",
+                "target": "platform",
+                "children": [],
+                "requirement": 0,
+                "acl_req": [
+                    "admin",
+                    "super"
+                ]
+            },
+            {
+                "label": "Rooms",
+                "menu_id": "Rooms:Rooms",
+                "url": "/interface/rooms/room_list.php",
+                "target": "room",
+                "children": [],
+                "requirement": 0,
+                "acl_req": [
+                    "admin",
+                    "users"
+                ]
+            }
+        ],
         "acl_req": []
-    },
-    {
+    }, {
         "label": "Popups",
         "menu_id": "popup",
         "children": [{
@@ -2116,8 +2139,7 @@
             }
         ],
         "requirement": 0
-    },
-    {
+    }, {
         "label": "About",
         "menu_id": "abo0",
         "target": "msc",
