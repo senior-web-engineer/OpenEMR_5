@@ -84,7 +84,7 @@ if (isset($_REQUEST["mode"])) {
             });
 
             function open_room(room_link){
-                location.target = '_self';
+                location.target = '_blank';
                 location.href=room_link;
             }
         </script>

@@ -140,9 +140,15 @@ $alertmsg = '';
                                     <td style="width:150px;"><span class="text"><?php echo xlt('Platform'); ?>: </span></td>
                                     <td style="width:220px;">
                                         <select name="platform" class="form-control" size="1" style="width:120px;">
-                                            <option value="Terms" <?php echo ($room_platform == 'Terms')?'selected':''; ?>>Terms</option>
-                                            <option value="Zoom"<?php echo ($room_platform == 'Zoom')?'selected':''; ?>>Zoom</option>
-                                            <option value="WebRTC"<?php echo ($room_platform == 'WebRTC')?'selected':''; ?>>WebRTC</option>
+                                        <?php
+                                            $query = "SELECT * FROM room_platform ORDER BY priority ASC";
+                                            $res = sqlStatement($query);
+                                            for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
+                                        ?>
+                                            <option value="<?php echo $row['platform']?>" <?php echo ($room_platform == $row['platform'])?'selected':''; ?>><?php echo $row['platform']?></option>
+                                        <?php
+                                            }
+                                        ?>
                                         </select>
                                     </td>
                                 </tr>

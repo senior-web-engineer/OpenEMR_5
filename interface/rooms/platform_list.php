@@ -31,21 +31,29 @@ if (!acl_check('admin', 'super')) {
 
 if (isset($_POST["mode"])) {
     if ($_POST["mode"] == "new_platform") {
-        sqlStatement(
+        $new_platform_id = sqlInsert(
             "INSERT INTO `room_platform` SET platform = ?, priority = ?",
             array(
                 trim((isset($_POST['platform']) ? $_POST['platform'] : '')),
                 0,
             )
         );
+
+        sqlStatement(
+            "UPDATE `room_platform` set priority = ? WHERE id = ?",
+            array(
+                $new_platform_id,
+                $new_platform_id
+            )
+        );
+
     }
 
     if ($_POST["mode"] == "edit_platform") {
         sqlStatement(
-            "UPDATE `room_platform` set platform = ?, priority = ? WHERE id = ?",
+            "UPDATE `room_platform` set platform = ? WHERE id = ?",
             array(
                 trim((isset($_POST['platform']) ? $_POST['platform'] : '')),
-                0,
                 trim((isset($_POST['id']) ? $_POST['id'] : ''))
             )
         );
@@ -61,9 +69,60 @@ if (isset($_POST["mode"])) {
     }
 }
 
-if (isset($_REQUEST["mode"])) {
+if (isset($_GET["mode"])) {
+    if ($_GET["mode"] == "down") {
+        $query = "SELECT * FROM room_platform WHERE priority > ? ORDER BY priority ASC LIMIT 1";
+        $res = sqlStatement($query, array($_GET["priority"]));
+        $row = sqlFetchArray($res);
+        if ($row)
+        {
+            sqlStatement(
+                "UPDATE `room_platform` set priority = ? WHERE id = ?",
+                array(
+                    $row['priority'],
+                    $_GET['id']
+                )
+            );
+
+            sqlStatement(
+                "UPDATE `room_platform` set priority = ? WHERE id = ?",
+                array(
+                    $_GET['priority'],
+                    $row['id']
+                )
+            );
+        }
+    }
+
+    if ($_GET["mode"] == "up") {
+        $query = "SELECT * FROM room_platform WHERE priority < ? ORDER BY priority DESC LIMIT 1";
+        $res = sqlStatement($query, array($_GET["priority"]));
+        $row = sqlFetchArray($res);
+        if ($row)
+        {
+            sqlStatement(
+                "UPDATE `room_platform` set priority = ? WHERE id = ?",
+                array(
+                    $row['priority'],
+                    $_GET['id']
+                )
+            );
+
+            sqlStatement(
+                "UPDATE `room_platform` set priority = ? WHERE id = ?",
+                array(
+                    $_GET['priority'],
+                    $row['id']
+                )
+            );
+        }
+    }
+}
+
+if (isset($_POST["mode"])) {
     exit(text(trim($alertmsg)));
 }
+
 ?>
 <html>
     <head>
@@ -81,6 +140,11 @@ if (isset($_REQUEST["mode"])) {
                 });
 
             });
+
+            function set_priority(sort, id, priority)
+            {
+                location.href="<?php echo $_SERVER['PHP_SELF'] ?>?mode=" + sort + "&id=" + id + "&priority=" + priority + "&csrf_token_form=" + "<?php echo attr(CsrfUtils::collectCsrfToken()); ?>";
+            }
         </script>
     </head>
     <body class="body_top">
@@ -103,10 +167,10 @@ if (isset($_REQUEST["mode"])) {
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th><?php echo xlt('Id'); ?></th>
-                                <th><?php echo xlt('Platform'); ?></th>
-                                <th><?php echo xlt('Priority'); ?></th>
-                                <th><?php echo xlt('Created Time'); ?></th>
+                                <th style="width:5%"><?php echo xlt('Id'); ?></th>
+                                <th style="width:60%"><?php echo xlt('Platform'); ?></th>
+                                <th style="width:20%"><?php echo xlt('Priority'); ?></th>
+                                <th style="width:15%"><?php echo xlt('Created Time'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,8 +185,8 @@ if (isset($_REQUEST["mode"])) {
                                 <td><?php echo "<b><a href='platform_add.php?id=" . attr_url($row{"id"}) . "&csrf_token_form=" . attr_url(CsrfUtils::collectCsrfToken()) .
                                 "' class='medium_modal' onclick='top.restoreSession()'>" . text($row{"platform"}) . "</a></b>";?></td>
                                 <td>
-                                    <a href="#" onclick="priority_down('<?php echo attr_url($row{"id"}) ?>')">Down</a>
-                                    <a href="#" onclick="priority_up('<?php echo attr_url($row{"id"}) ?>')">Up</a>
+                                    <a href="#" onclick="set_priority('down', <?php echo attr_url($row{"id"}) ?>, <?php echo attr_url($row{"priority"}) ?>)"><span class="glyphicon glyphicon-arrow-down"></span></a>
+                                    <a href="#" onclick="set_priority('up', <?php echo attr_url($row{"id"}) ?>, <?php echo attr_url($row{"priority"}) ?>)"><span class="glyphicon glyphicon-arrow-up"></span></a>
                                 </td>
                                 <td><?php echo $row['created_time']; ?></td>
                             </tr>
