@@ -4,7 +4,7 @@
 ALTER TABLE `openemr_postcalendar_events` ADD `pc_roomlink` VARCHAR(128) NOT NULL AFTER `pc_room`;
 ```
 
-- Create new table
+- Update rooms
 
 ```
 CREATE TABLE `rooms` (
