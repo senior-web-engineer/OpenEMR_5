@@ -36,6 +36,9 @@ if (!acl_check('admin', 'super')) {
         <title><?php echo xlt('Rooms / Telehealth');?></title>
         <?php Header::setupHeader(['common','jquery-ui']); ?>
         <script type="text/javascript">
+            function start_session(room_link) {
+                location.href = room_link;
+            }
         </script>
     </head>
     <body class="body_top">
@@ -92,27 +95,25 @@ if (!acl_check('admin', 'super')) {
                 </div>
                 <div class="col-xs-10">
                     <table class="table table-striped">
-                        <tr>
-                            <td style="padding-top:25px;">1</td>
-                            <td><img src='./img/avatar.png'></td>
-                            <td style="padding-top:25px;">Patient Name</td>
-                            <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Send a Message"></td>
-                            <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Start Session"></td>
-                        </tr>
-                        <tr>
-                            <td style="padding-top:25px;">2</td>
-                            <td><img src='./img/avatar.png'></td>
-                            <td style="padding-top:25px;">Patient Name</td>
-                            <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Send a Message"></td>
-                            <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Start Session"></td>
-                        </tr>
-                        <tr>
-                            <td style="padding-top:25px;">3</td>
-                            <td><img src='./img/avatar.png'></td>
-                            <td style="padding-top:25px;">Patient Name</td>
-                            <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Send a Message"></td>
-                            <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Start Session"></td>
-                        </tr>
+                    <?php
+                        $query = "SELECT a.pc_roomlink, b.fname, b.lname, b.mname, b.phone_cell, b.email, CONCAT(pc_eventDate, ' ', pc_startTime) as pc_eventDateTime FROM openemr_postcalendar_events a INNER JOIN patient_data b ON a.pc_pid=b.id WHERE a.pc_aid=".$_SESSION['authUserID']." AND CONCAT(pc_eventDate, ' ', pc_startTime) >= NOW() ORDER BY a.pc_eventDate, pc_startTime, pc_endTime ASC";
+                        $res = sqlStatement($query);
+                        for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
+                    ?>
+                            <tr>
+                                <td style="padding-top:25px;"><?php echo ($iter+1); ?></td>
+                                <td><img src='./img/avatar.png'></td>
+                                <td style="padding-top:20px;">
+                                    <?php echo text($row['fname'])." ". text($row['mname']) . " " . text($row['lname']);?>
+                                    <br>
+                                    <?php echo text($row['pc_eventDateTime']);?>
+                                </td>
+                                <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Send a Message"></td>
+                                <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Start Session" onclick="start_session('<?php echo text($row['pc_roomlink']);?>')"></td>
+                            </tr>
+                    <?php
+                        }
+                    ?>
                     </table>
                 </div>
             </div>
