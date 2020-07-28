@@ -28,6 +28,24 @@ if (!acl_check('admin', 'super')) {
     die(xlt('Access denied'));
 }
 
+if (isset($_POST["mode"])) {
+    if ($_POST["mode"] == "get_roomlink") {
+        $user_id = $_POST["user_id"];
+        $platform = $_POST["platform"];
+        $query = "SELECT * FROM rooms WHERE user_id=$user_id AND platform='$platform'";
+        $res = sqlStatement($query);
+        $row = sqlFetchArray($res);
+        $room_link = "";
+        if ($row) {
+            $room_link = $row['room_link'];
+        }
+        echo $room_link;
+    }
+}
+
+if (isset($_REQUEST["mode"])) {
+    exit(text(trim($alertmsg)));
+}
 
 ?>
 
@@ -38,6 +56,23 @@ if (!acl_check('admin', 'super')) {
         <script type="text/javascript">
             function start_session(room_link) {
                 location.href = room_link;
+            }
+
+            function change_room() {
+                let form_data = $("#telehealth_form").serialize();
+                $.ajax({
+                    url: '<?php echo $_SERVER['PHP_SELF'];?>',
+                    type: 'post',
+                    data: form_data
+                }).done(function (r) {
+                    if (r) {
+                        $("#room_link").val(r);
+                    } else {
+                        $("#room_link").val(r);
+                    }
+                });
+
+                return false;
             }
         </script>
     </head>
@@ -50,12 +85,16 @@ if (!acl_check('admin', 'super')) {
                     </div>
                 </div>
             </div>
+            <form name='telehealth_form' id="telehealth_form" method='post' action="<?php echo $_SERVER['PHP_SELF'];?>">
+            <input type="hidden" name="csrf_token_form" value="<?php echo attr(CsrfUtils::collectCsrfToken()); ?>" />
+            <input type='hidden' name='mode' id='mode' value='<?php echo 'get_roomlink'; ?>'>
+            <input type='hidden' name='user_id' id='user_id' value='<?php echo $_SESSION['authUserID']; ?>'>
             <div class="row">
                 <div class="col-xs-2">
                     <label style="padding-top: 10px;">Platform: </label>
                 </div>
                 <div class="col-xs-2">
-                    <select name="platform" size="1" class="form-control">
+                    <select name="platform" size="1" class="form-control" onchange="change_room()">
                     <?php
                         $query = "SELECT * FROM room_platform ORDER BY priority ASC";
                         $res = sqlStatement($query);
@@ -73,9 +112,10 @@ if (!acl_check('admin', 'super')) {
                     <label style="padding-top: 10px;">Room Link: </label>
                 </div>
                 <div class="col-xs-10">
-                    <input type="text" class="form-control" name="room_link">
+                    <input type="text" class="form-control" name="room_link" id="room_link" readonly style="background:#fff">
                 </div>
             </div>
+            </form>
             <div class="row">
                 <div class="col-xs-2">
                     <label style="padding-top: 10px;">Scheduled Meeting: </label>
