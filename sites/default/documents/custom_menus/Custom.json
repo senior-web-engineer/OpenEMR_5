@@ -1988,6 +1988,18 @@
                     "admin",
                     "users"
                 ]
+            },
+            {
+                "label": "Telehealth Page",
+                "menu_id": "Rooms:Telehealth",
+                "url": "/interface/rooms/telehealth_main.php",
+                "target": "telehealth",
+                "children": [],
+                "requirement": 0,
+                "acl_req": [
+                    "admin",
+                    "users"
+                ]
             }
         ],
         "acl_req": []
