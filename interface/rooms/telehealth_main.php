@@ -28,7 +28,13 @@ if (!acl_check('admin', 'super')) {
     die(xlt('Access denied'));
 }
 
+$mode = 'get_roomlink';
+$platform = '';
+$room_link = '';
+$meetingurl  = "";
+
 if (isset($_POST["mode"])) {
+    $mode = $_POST["mode"];
     if ($_POST["mode"] == "get_roomlink") {
         $user_id = $_POST["user_id"];
         $platform = $_POST["platform"];
@@ -36,15 +42,39 @@ if (isset($_POST["mode"])) {
         $res = sqlStatement($query);
         $row = sqlFetchArray($res);
         $room_link = "";
-        if ($row) {
+        if ($row)
             $room_link = $row['room_link'];
-        }
         echo $room_link;
+    }
+
+    if ($_POST["mode"] == "join_room") {
+        $user_id = $_POST["user_id"];
+        $platform = $_POST["platform"];
+        $query = "SELECT * FROM users WHERE id=$user_id";
+        $res = sqlStatement($query);
+        $row = sqlFetchArray($res);
+        $name = implode(" ", [$row['fname'], $row['mname'], $row['lname']]);
+        $un = base64_encode($name);
+        $query = "SELECT * FROM rooms WHERE user_id=$user_id AND platform='$platform'";
+        $res = sqlStatement($query);
+        $row = sqlFetchArray($res);
+        $room_link = "";
+        if ($row)
+            $room_link = $row['room_link'];
+
+        if ($platform == "Zoom") {
+            preg_match('/\d+?/', $room_link, $matches);
+            if (count($matches) > 0)
+                $meetingid = $matches[0];
+            if ($meetingid != '')
+                $meetingurl = "https://zoom.us/wc/2426584900/join?prefer=1&un=".$un;
+        }
     }
 }
 
 if (isset($_REQUEST["mode"])) {
-    exit(text(trim($alertmsg)));
+    if ($_REQUEST["mode"] == "get_roomlink")
+        exit(text(trim($alertmsg)));
 }
 
 ?>
@@ -65,14 +95,15 @@ if (isset($_REQUEST["mode"])) {
                     type: 'post',
                     data: form_data
                 }).done(function (r) {
-                    if (r) {
-                        $("#room_link").val(r);
-                    } else {
-                        $("#room_link").val(r);
-                    }
+                    $("#room_link").val(r);
                 });
 
                 return false;
+            }
+
+            function join_room() {
+                $("#mode").val('join_room');
+                telehealth_form.submit();
             }
         </script>
     </head>
@@ -87,7 +118,7 @@ if (isset($_REQUEST["mode"])) {
             </div>
             <form name='telehealth_form' id="telehealth_form" method='post' action="<?php echo $_SERVER['PHP_SELF'];?>">
             <input type="hidden" name="csrf_token_form" value="<?php echo attr(CsrfUtils::collectCsrfToken()); ?>" />
-            <input type='hidden' name='mode' id='mode' value='<?php echo 'get_roomlink'; ?>'>
+            <input type='hidden' name='mode' id='mode' value='<?php echo $mode; ?>'>
             <input type='hidden' name='user_id' id='user_id' value='<?php echo $_SESSION['authUserID']; ?>'>
             <div class="row">
                 <div class="col-xs-2">
@@ -100,7 +131,7 @@ if (isset($_REQUEST["mode"])) {
                         $res = sqlStatement($query);
                         for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
                     ?>
-                        <option value="<?php echo $row['platform']; ?>"><?php echo $row['platform'];?></option>
+                        <option value="<?php echo $row['platform']; ?>" <?php echo ($platform == $row['platform'])?'selected':''; ?>><?php echo $row['platform'];?></option>
                     <?php
                         }
                     ?>
@@ -112,7 +143,7 @@ if (isset($_REQUEST["mode"])) {
                     <label style="padding-top: 10px;">Room Link: </label>
                 </div>
                 <div class="col-xs-10">
-                    <input type="text" class="form-control" name="room_link" id="room_link" readonly style="background:#fff">
+                    <input type="text" class="form-control" name="room_link" id="room_link" readonly style="background:#fff" value="<?php echo $room_link; ?>">
                 </div>
             </div>
             </form>
@@ -123,8 +154,16 @@ if (isset($_REQUEST["mode"])) {
                 <div class="col-xs-4">
                     <table class="table table-striped">
                         <tr>
-                            <td><img src='./img/avatar.png' width='280px' height='280px'></td>
-                            <td><input type="button" class="form-control" value="Scheduled Meeting"></td>
+                            <td>
+                                <?php if ($meetingurl == '') { ?>
+                                    <img src='./img/avatar.png' width='480px' height='480px'>
+                                <?php } else { ?>
+                                    <div class="iframe-container" style="overflow: hidden; width:480px; height:480px; position: relative;">
+                                        <iframe allow="microphone; camera" style="border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;" src="<?php echo $meetingurl; ?>" sandbox="allow-forms allow-scripts allow-same-origin" allow="microphone; camera"></iframe>
+                                    </div>
+                                <?php } ?>
+                            </td>
+                            <td><input type="button" class="form-control" value="Scheduled Meeting" onclick="join_room()"></td>
                         </tr>
                     </table>
                 </div>
