@@ -6,6 +6,7 @@
 require_once("../globals.php");
 require_once("../../library/acl.inc");
 require_once("$srcdir/auth.inc");
+require_once("./twilio_api.php");
 
 use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Core\Header;
@@ -22,7 +23,6 @@ if (!empty($_GET)) {
         CsrfUtils::csrfNotVerified();
     }
 }
-
 
 if (!acl_check('admin', 'super')) {
     die(xlt('Access denied'));
@@ -44,36 +44,41 @@ if (isset($_POST["mode"])) {
         $room_link = "";
         if ($row)
             $room_link = $row['room_link'];
+
+        if ($platform == "Twilio") {
+            $room = create_room();
+            $room_link = $room['url'];
+        }
         echo $room_link;
     }
 
     if ($_POST["mode"] == "join_room") {
         $user_id = $_POST["user_id"];
         $platform = $_POST["platform"];
-        $query = "SELECT * FROM users WHERE id=$user_id";
-        $res = sqlStatement($query);
-        $row = sqlFetchArray($res);
-        $name = implode(" ", [$row['fname'], $row['mname'], $row['lname']]);
-        $un = base64_encode($name);
-        $query = "SELECT * FROM rooms WHERE user_id=$user_id AND platform='$platform'";
-        $res = sqlStatement($query);
-        $row = sqlFetchArray($res);
-        $room_link = "";
-        if ($row)
-            $room_link = $row['room_link'];
-
         if ($platform == "Zoom") {
+            $query = "SELECT * FROM users WHERE id=$user_id";
+            $res = sqlStatement($query);
+            $row = sqlFetchArray($res);
+            $name = implode(" ", [$row['fname'], $row['mname'], $row['lname']]);
+            $un = base64_encode($name);
+            $query = "SELECT * FROM rooms WHERE user_id=$user_id AND platform='$platform'";
+            $res = sqlStatement($query);
+            $row = sqlFetchArray($res);
+            if ($row)
+                $room_link = $row['room_link'];
+
             $pattern = preg_quote($room_link, '/');
             preg_match('/\/([0-9]+)\?/', $room_link, $matches);
             if (count($matches) > 0)
                 $meetingid = str_replace("/", "", $matches[0]);
                 $meetingid = str_replace("?", "", $meetingid);
             if ($meetingid != '') {
-                //start
                 $meetingurl = "https://zoom.us/s/".$meetingid;
-                //join
                 //$meetingurl = "https://zoom.us/wc/".$meetingid."/join?prefer=0&un=".$un;
             }
+        }
+        if ($platform == "Twilio") {
+            $meetingurl = $room_link;
         }
     }
 }
