@@ -63,11 +63,17 @@ if (isset($_POST["mode"])) {
             $room_link = $row['room_link'];
 
         if ($platform == "Zoom") {
-            preg_match('/\d+?/', $room_link, $matches);
+            $pattern = preg_quote($room_link, '/');
+            preg_match('/\/([0-9]+)\?/', $room_link, $matches);
             if (count($matches) > 0)
-                $meetingid = $matches[0];
-            if ($meetingid != '')
-                $meetingurl = "https://zoom.us/wc/".$meetingid."/join?prefer=1&un=".$un;
+                $meetingid = str_replace("/", "", $matches[0]);
+                $meetingid = str_replace("?", "", $meetingid);
+            if ($meetingid != '') {
+                //start
+                $meetingurl = "https://zoom.us/s/".$meetingid;
+                //join
+                //$meetingurl = "https://zoom.us/wc/".$meetingid."/join?prefer=0&un=".$un;
+            }
         }
     }
 }
