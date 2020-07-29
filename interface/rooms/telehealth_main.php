@@ -67,7 +67,7 @@ if (isset($_POST["mode"])) {
             if (count($matches) > 0)
                 $meetingid = $matches[0];
             if ($meetingid != '')
-                $meetingurl = "https://zoom.us/wc/2426584900/join?prefer=1&un=".$un;
+                $meetingurl = "https://zoom.us/wc/".$meetingid."/join?prefer=1&un=".$un;
         }
     }
 }
