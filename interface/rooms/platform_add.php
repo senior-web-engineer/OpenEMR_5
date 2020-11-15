@@ -68,6 +68,10 @@ $alertmsg = '';
                 let request_method = $("#new_platform").attr("method");
                 let form_data = $("#new_platform").serialize();
 
+                console.log(post_url);
+                console.log(request_method);
+                console.log(form_data);
+
                 $.ajax({
                     url: post_url,
                     type: request_method,
