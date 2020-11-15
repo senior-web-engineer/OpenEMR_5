@@ -41,6 +41,27 @@ $alertmsg = '';
         <?php Header::setupHeader(['common','opener']); ?>
         <script language="JavaScript">
 
+            function change_platform() {
+                var platform = $("#platform").val();
+                if (platform == "WebRTC") {
+                    $("#generate-roomid").show();
+                }else {
+                    $("#generate-roomid").hide();
+                }
+            }
+
+            function generate_roomid() {
+                var room_id           = '';
+                var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                var charactersLength = characters.length;
+                for ( var i = 0; i < 20; i++ ) {
+                    room_id += characters.charAt(Math.floor(Math.random() * charactersLength));
+                }
+                var room_original = $("#roomlink").val();
+                room_original = room_original + room_id;
+                $("#roomlink").val(room_original);
+            }
+
             function submitform() {
                 top.restoreSession();
                 alertMsg='';
@@ -116,7 +137,7 @@ $alertmsg = '';
                                 <tr>
                                     <td style="width:150px;"><span class="text"><?php echo xlt('Username'); ?>: </span></td>
                                     <td style="width:220px;">
-                                        <select name="user_id" id="user_id" class="form-control" size="1" style="width:120px;">
+                                        <select name="user_id" id="user_id" class="form-control" size="1" style="width:220px;">
                                         <?php
                                             if ($_SESSION['authUserID'] == 1)
                                             {
@@ -139,7 +160,8 @@ $alertmsg = '';
                                 <tr>
                                     <td style="width:150px;"><span class="text"><?php echo xlt('Platform'); ?>: </span></td>
                                     <td style="width:220px;">
-                                        <select name="platform" class="form-control" size="1" style="width:120px;">
+                                        <select name="platform" class="form-control" size="1" style="width:220px;" id="platform" onchange="change_platform()">
+                                            <option value="">--Select--</option>
                                         <?php
                                             $query = "SELECT * FROM room_platform ORDER BY priority ASC";
                                             $res = sqlStatement($query);
@@ -151,11 +173,14 @@ $alertmsg = '';
                                         ?>
                                         </select>
                                     </td>
+                                    <td>
+                                        <input type="button" class="btn btn-link btn-save" name="generate-roomid" id="generate-roomid" onclick="javascript:generate_roomid()" style="margin-left:10px;display:none" value="Generate" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td style="width:150px;"><span class="text"><?php echo xlt('Room Link'); ?>: </span></td>
-                                    <td style="width:220px;">
-                                        <input type="text" name="roomlink" class="form-control" value="<?php echo $room_link; ?>">
+                                    <td colspan="2">
+                                        <input type="text" name="roomlink" id="roomlink" class="form-control" value="<?php echo $room_link; ?>" style="width:100%">
                                     </td>
                                 </tr>
                             </table>

@@ -32,6 +32,8 @@ $mode = 'get_roomlink';
 $platform = '';
 $room_link = '';
 $meetingurl  = "";
+$patient_phone = "";
+$invite_message = "";
 
 if (isset($_POST["mode"])) {
     $mode = $_POST["mode"];
@@ -81,10 +83,18 @@ if (isset($_POST["mode"])) {
             $meetingurl = $room_link;
         }
     }
+
+    if ($_POST["mode"] == "invite_room") {
+        $patient_phone = $_POST["patient_phone"];
+        $room_link = $_POST["invite_roomlink"];
+        $invite_message = $_POST["invite_message"];
+
+        send_sms($patient_phone, $invite_message);
+    }
 }
 
 if (isset($_REQUEST["mode"])) {
-    if ($_REQUEST["mode"] == "get_roomlink")
+    if ($_REQUEST["mode"] == "get_roomlink" || $_REQUEST["mode"] == "invite_room")
         exit(text(trim($alertmsg)));
 }
 
@@ -94,265 +104,38 @@ if (isset($_REQUEST["mode"])) {
     <head>
         <title><?php echo xlt('Rooms / Telehealth');?></title>
         <?php Header::setupHeader(['common','jquery-ui']); ?>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-        <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
         <script type="text/javascript">
-            var isChannelReady = false;
-            var isInitiator = false;
-            var isStarted = false;
-            var localStream;
-            var pc;
-            var remoteStream;
-            var turnReady;
-
-            var pcConfig = {
-                'iceServers': [{
-                    'urls': 'stun.stun.l.google.com:19302'
-                }]
-            };
-
-            var sdpConstraints = {
-                offerToReceiveAudio: true,
-                offerToReceiveVideo: true
-            };
-
-            var room = 'foo';
-
-            var socket = io.connect();
-
-            if (room !== '') {
-                socket.emit('create or join', room);
-                console.log('Attpemted to create or join room', room);
-            }
-
-            socket.on('created', function (room) {
-                console.log('Created room ' + room);
-                isInitiator = true;
-            });
-
-            socket.on('full', function (room) {
-                console.log('Room ' + room + ' is full');
-            });
-
-            socket.on('join', function (room) {
-                console.log('Another peer made a request to join room ' + room);
-                console.log('This peer is the initiator of room ' + room + '!');
-                isChannelReady = true;
-            });
-
-            socket.on('joined', function (room) {
-                console.log('joined: ' + room);
-                isChannelReady = true;
-            });
-
-            socket.on('log', function (array) {
-                console.log.apply(console, array);
-            });
-
-            function sendMessage(message) {
-                console.log('Client sending message: ', message);
-                socket.emit('message', message);
-            }
-
-            // This client receives a message
-            socket.on('message', function (message) {
-                console.log('Client received message:', message);
-                if (message === 'got user media') {
-                    maybeStart();
-                } else if (message.type === 'offer') {
-                    if (!isInitiator && !isStarted) {
-                        maybeStart();
-                    }
-                    pc.setRemoteDescription(new RTCSessionDescription(message));
-                    doAnswer();
-                } else if (message.type === 'answer' && isStarted) {
-                    pc.setRemoteDescription(new RTCSessionDescription(message));
-                } else if (message.type === 'candidate' && isStarted) {
-                    var candidate = new RTCIceCandidate({
-                        sdpMLineIndex: message.label,
-                        candidate: message.candidate
-                    });
-                    pc.addIceCandidate(candidate);
-                } else if (message === 'bye' && isStarted) {
-                    handleRemoteHangup();
-                }
-            });
-
-            var localVideo = document.querySelector('#localVideo');
-            var remoteVideo = document.querySelector('#remoteVideo');
-
-            // navigator.mediaDevices.getUserMedia({
-            //     audio: false,
-            //     video: true
-            // })
-            // .then(gotStream)
-            // .catch(function (e) {
-            //     alert('getUserMedia() error: ' + e.name);
-            // });
-
-            function gotStream(stream) {
-                console.log('Adding local stream.');
-                localStream = stream;
-                localVideo.srcObject = stream;
-                sendMessage('got user media');
-                if (isInitiator) {
-                    maybeStart();
-                }
-            }
-
-            var constraints = {
-                video: true
-            };
-
-            console.log('Getting user media with constraints', constraints);
-
-            if (location.hostname !== 'localhost') {
-                requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
-            }
-
-            function maybeStart() {
-                console.log('>>>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
-                if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
-                    console.log('>>>>>>>>> creating peer connection');
-                    createPeerConnection();
-                    pc.addStream(localStream);
-                    isStarted = true;
-                    console.log('isInitiator', isInitiator);
-                    if (isInitiator) {
-                        doCall();
-                    }
-                }
-            }
-
-            window.onbeforeunload = function () {
-                sendMessage('bye');
-            }
-
-            function createPeerConnection() {
-                try {
-                    pc = new RTCPeerConnection(null);
-                    pc.onicecandidate = handleIceCandidate;
-                    pc.onaddstream = handleRemoteStreamAdded;
-                    pc.onremovestream = handleRemoteStreamRemoved;
-                    console.log('Created RTCPeerConnection');
-                } catch (e) {
-                    console.log('Failed to create PeerConnection , exception: ' + e.message);
-                    alert('Cannot create RTCPeerConnection object.');
+            function change_invite(invite_type) {
+                var room_link = $("#room_link").val();
+                if (room_link == '')
+                    return;
+                if (invite_type == 'email') {
+                    var subject = "Telemedicine meeting invitation";
+                    var body = "Hello. \r\n\r\nPlease join me for a secure video call:\r\n\r\n" + room_link;
+                    location.href="mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
                     return;
                 }
-            }
-
-            function handleIceCandidate(event) {
-                console.log('icecandidate event: ', event);
-                if (event.candidate) {
-                    sendMessage({
-                        type: 'candidate',
-                        label: event.candidate.sdpMLineIndex,
-                        id: event.candidate.sdpMid,
-                        candidate: event.candidate.candidate
+                if (invite_type == 'text') {
+                    dlgopen('', '', 660, 200, '', '', {
+                        type: 'iframe',
+                        url: 'invite_text.php?room=' + room_link
                     });
-                } else {
-                    console.log('End of candidates');
                 }
             }
 
-            function handleCreateOfferError(event) {
-                console.log('createOffer() error: ', event);
-            }
-
-            function doCall() {
-                console.log('Sending offer to peer');
-                pc.createOffer(setLocalAndSendMessage, handleCreateOfferError);
-            }
-
-            function doAnswer() {
-                console.log('Sending answer to peer.');
-                pc.createAnswer().then(
-                    setLocalAndSendMessage,
-                    onCreateSessionDescriptionError
-                );
-            }
-
-            function setLocalAndSendMessage(sessionDescription) {
-                pc.setLocalDescription(sessionDescription);
-                console.log('setLocalAndSendMessage sending message', sessionDescription);
-                sendMessage(sessionDescription);
-            }
-
-            function onCreateSessionDescriptionError(error) {
-                console.trace('Failed to create session description: ' + error.toString());
-            }
-
-            function requestTurn(turnURL) {
-                var turnExists = false;
-
-                for (var i in pcConfig.iceServers) {
-                    if (pcConfig.iceServers[i].urls.substr(0, 5) === 'turn:') {
-                        turnExists = true;
-                        turnReady = true;
-                        break;
-                    }
-                }
-                if (!turnExists) {
-                    console.log('Getting TURN server from ', turnURL);
-                    // No TURN server. Get one from computengineondemand.appspot.com;
-                    var xhr = new XMLHttpRequest();
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState === 4 && xhr.status === 200) {
-                            var turnServer = JSON.parse(xhr.responseText);
-                            console.log('Got TURN server: ', turnServer);
-                            pcConfig.iceServers.push({
-                                'urls': 'turn:' + turnServer.username + '@' + turnServer.turn,
-                                'credential': turnServer.password
-                            });
-                            turnReady = true;
-                        }
-                    };
-                    xhr.open('GET', turnURL, true);
-                    xhr.send();
-                }
-            }
-
-            function handleRemoteStreamAdded(event) {
-                console.log('Remote stream added.');
-                remoteStream = event.stream;
-                remoteVideo.srcObject = remoteStream;
-            }
-
-            function handleRemoteStreamRemoved(event) {
-                console.log('Remote stream removed. Event: ', event);
-            }
-
-            function hangup() {
-                console.log('Hanging up');
-                stop();
-                sendMessage('bye');
-            }
-
-            function handleRemoteHangup() {
-                console.log('Session terminated.');
-                stop();
-                isInitiator = false;
-            }
-
-            function stop() {
-                isStarted = false;
-                pc.close();
-                pc = null;
+            function roomlink_copy() {
+                $("#room_link").select();
+                document.execCommand("copy");
             }
 
             function start_session(room_link) {
-                location.href = room_link;
-
-                navigator.mediaDevices.getUserMedia({
-                    audio: false,
-                    video: true
-                })
-                .then(gotStream)
-                .catch(function (e) {
-                    alert('getUserMedia() error: ' + e.name);
-                });
+                $("#room_link").val(room_link);
+                if (room_link.indexOf("zoom.") >= 0 || room_link.indexOf("teams.") >= 0) {
+                    window.open(room_link, '_blank');
+                }
+                else {
+                    $("#video-section").attr('src', room_link);
+                }
             }
 
             function change_room() {
@@ -365,6 +148,20 @@ if (isset($_REQUEST["mode"])) {
                     $("#room_link").val(r);
                 });
 
+                var platform = $("#platform").val();
+                if (platform == "WebRTC" || platform == "Twilio") {
+                    $("#zoom_teams_btn").hide();
+                    $("#patient-list").show();
+                }
+                else if (platform == "Teams" || platform == "Zoom") {
+                    $("#zoom_teams_btn").show();
+                    $("#patient-list").hide();
+                }
+                else {
+                    $("#zoom_teams_btn").show();
+                    $("#patient-list").show();
+                }
+
                 return false;
             }
 
@@ -372,101 +169,189 @@ if (isset($_REQUEST["mode"])) {
                 $("#mode").val('join_room');
                 telehealth_form.submit();
             }
+
+            function open_room(){
+                var room_link = $("#room_link").val();
+
+                if (room_link == "")
+                    return;
+
+                location.target = '_blank';
+                location.href=room_link;
+            }
+
+            function show_meetinglist() {
+                if ($("#meeting_list").css("display") == "table") {
+                    $("#meeting_list").hide();
+                } else {
+                    $("#meeting_list").show();
+                }
+            }
         </script>
+        <style>
+            .telehealth-table td {
+                padding: 0 5px;
+            }
+        </style>
     </head>
     <body class="body_top">
         <div class="container">
             <div class="row">
-                <div class="col-xs-12">
+                <div class="col-xs-1"></div>
+                <div class="col-xs-10">
                     <div class="page-title">
                         <h2><?php echo xlt('Telehealth Meetings');?></h2>
                     </div>
                 </div>
+                <div class="col-xs-1"></div>
             </div>
             <form name='telehealth_form' id="telehealth_form" method='post' action="<?php echo $_SERVER['PHP_SELF'];?>">
             <input type="hidden" name="csrf_token_form" value="<?php echo attr(CsrfUtils::collectCsrfToken()); ?>" />
             <input type='hidden' name='mode' id='mode' value='<?php echo $mode; ?>'>
             <input type='hidden' name='user_id' id='user_id' value='<?php echo $_SESSION['authUserID']; ?>'>
             <div class="row">
-                <div class="col-xs-2">
-                    <label style="padding-top: 10px;">Platform: </label>
-                </div>
-                <div class="col-xs-2">
-                    <select name="platform" size="1" class="form-control" onchange="change_room()">
-                    <?php
-                        $query = "SELECT * FROM room_platform ORDER BY priority ASC";
-                        $res = sqlStatement($query);
-                        for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
-                    ?>
-                        <option value="<?php echo $row['platform']; ?>" <?php echo ($platform == $row['platform'])?'selected':''; ?>><?php echo $row['platform'];?></option>
-                    <?php
-                        }
-                    ?>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-2">
-                    <label style="padding-top: 10px;">Room Link: </label>
-                </div>
-                <div class="col-xs-10">
-                    <input type="text" class="form-control" name="room_link" id="room_link" readonly style="background:#fff" value="<?php echo $room_link; ?>">
+                <div class="col-xs-12">
+                    <div class="table-responsive">
+                        <table border="0" class="table">
+                            <tr>
+                                <td style="width: 65% !important;vertical-align: top;">
+                                    <table class="telehealth-table">
+                                        <tr>
+                                            <td>
+                                                <label style="padding-top: 10px;">Room: </label>
+                                            </td>
+                                            <td>
+                                                <select name="platform" id="platform" size="1" class="form-control" onchange="change_room()" style="height:34px;">
+                                                    <option value="">--Select--</option>
+                                                    <?php
+                                                    $query = "SELECT * FROM room_platform ORDER BY priority ASC";
+                                                    $res = sqlStatement($query);
+                                                    for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
+                                                        ?>
+                                                        <option value="<?php echo $row['platform']; ?>" <?php echo ($platform == $row['platform'])?'selected':''; ?>><?php echo $row['platform'];?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="room_link" id="room_link" readonly style="background:#fff;margin-top:0px" value="<?php echo $room_link; ?>">
+                                            </td>
+                                            <td>
+                                                <input type="button" class="form-control" value="Copy" onclick="javascript:roomlink_copy()" />
+                                            </td>
+                                            <td>
+                                                <select name="invite_mode" size="1" class="form-control" style="height:34px;" onchange="change_invite(this.value)">
+                                                    <option value="">Invite via</option>
+                                                    <option value="email">Email</option>
+                                                    <option value="text">Text</option>
+                                                </select>
+                                            </td>
+                                            <td >
+                                                <input type="button" class="form-control" id="zoom_teams_btn" value="ZOOM/TEAMS" onclick="open_room()">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="6" style="padding-top: 20px;">
+                                                <div id="patient-list">
+                                                    <div class="">
+                                                        <label style="padding-top: 10px;">Patient List: </label>
+                                                    </div>
+                                                    <div class="">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th class="text-center"></th>
+                                                                <th class="text-center">Name</th>
+                                                                <th class="text-center">Meeting Time</th>
+                                                                <th class="text-center">Ation</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <?php
+                                                            $query = "SELECT a.pc_roomlink, b.fname, b.lname, b.mname, b.phone_cell, b.email, CONCAT(pc_eventDate, ' ', pc_startTime) as pc_eventDateTime FROM openemr_postcalendar_events a INNER JOIN patient_data b ON a.pc_pid=b.id WHERE a.pc_aid=".$_SESSION['authUserID']." AND CONCAT(pc_eventDate, ' ', pc_startTime) >= NOW() ORDER BY a.pc_eventDate, pc_startTime, pc_endTime ASC";
+                                                            $res = sqlStatement($query);
+                                                            for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
+                                                                ?>
+                                                                <tr>
+                                                                    <td style="padding-top:25px;"><?php echo ($iter+1); ?></td>
+                                                                    <td><img src='./img/avatar.png'></td>
+                                                                    <td style="padding-top:30px;" class="text-center">
+                                                                        <?php echo text($row['fname'])." ". text($row['mname']) . " " . text($row['lname']);?>
+                                                                    </td>
+                                                                    <td class="text-center" style="padding-top:30px;">
+                                                                        <?php echo text($row['pc_eventDateTime']);?>
+                                                                    </td>
+                                                                    <td style="padding: 20px 5px;display: flex;" class="text-center">
+                                                                        <input type="button" class="form-control" style=" width:50%" value="Send a Message">
+                                                                        <input type="button" class="form-control" style=" width:50%" value="Start Session" onclick="start_session('<?php echo $row['pc_roomlink'] ?>')">
+                                                                    </td>
+                                                                </tr>
+                                                                <?php
+                                                            }
+                                                            ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="vertical-align: top">
+                                    <div class="col-xs-2">
+                                        <table class="table">
+                                            <tr>
+                                                <td>
+                                                    <div class="iframe-container" style="overflow: hidden; width:360px; height:360px; position: relative; border: 1px solid #aaa;">
+                                                        <iframe allow="microphone; camera" style="border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;" src="<?php echo $meetingurl; ?>" sandbox="allow-forms allow-scripts allow-same-origin" id="video-section"></iframe>
+                                                    </div>
+                                                    <input type="button" class="form-control" style="margin-top: 10px; width: 360px;" value="Schedule Meetings" onclick="javascript:show_meetinglist()" />
+
+                                                    <table id="meeting_list" name="meeting_list" class="table" style="margin-top: 10px; width: 360px;">
+                                                        <thead>
+                                                        <tr>
+                                                            <th class="text-center" width="50%">Name</th>
+                                                            <th class="text-center" width="50%">Meeting</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <?php
+                                                        $res = sqlStatement("SELECT b.fname, CONCAT(a.pc_eventDate, ' ', a.pc_startTime) as pc_eventDateTime FROM openemr_postcalendar_events a INNER JOIN patient_data b ON a.pc_pid=b.id WHERE a.pc_aid=? AND DATE(a.pc_eventDate) = CURDATE() ORDER BY a.pc_eventDate, a.pc_startTime, a.pc_endTime ASC ", array($_SESSION['authUserID']));
+                                                        while ($row = sqlFetchArray($res)) {
+                                                            ?>
+                                                            <tr>
+                                                                <td class="text-center"><?php echo text($row['fname']) ?></td>
+                                                                <td class="text-center"><?php echo text($row['pc_eventDateTime']) ?></td>
+                                                            </tr>
+                                                            <?php
+                                                        }
+                                                        ?>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                <!--td><input type="button" class="form-control" value="Scheduled Meeting" onclick="join_room()"></td-->
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--
+                            <tr>
+                                <td rowspan="2">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">
+                                </td>
+                            </tr>
+                            -->
+                        </table>
+                    </div>
                 </div>
             </div>
             </form>
-            <div class="row">
-                <div class="col-xs-2">
-                    <label style="padding-top: 10px;">Scheduled Meeting: </label>
-                </div>
-                <div class="col-xs-4">
-                    <table class="table table-striped">
-                        <tr>
-                            <td>
-                                <?php if ($meetingurl == '') { ?>
-                                    <img src='./img/avatar.png' width='480px' height='480px'>
-                                <?php } else { ?>
-<!--                                    <div class="iframe-container" style="overflow: hidden; width:480px; height:480px; position: relative;">-->
-<!--                                        <iframe allow="microphone; camera" style="border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;" src="--><?php //echo $meetingurl; ?><!--" sandbox="allow-forms allow-scripts allow-same-origin" allow="microphone; camera"></iframe>-->
-<!--                                    </div>-->
-                                    <div id="videos" style="overflow: hidden; width: 480px; height: 480px; position: relative;">
-                                        <video id="localVideo" style="display: none" autoplay muted playsinline></video>
-                                        <video id="remoteVideo" autoplay playsinline></video>
-                                    </div>
-                                <?php } ?>
-                            </td>
-                            <td><input type="button" class="form-control" value="Scheduled Meeting" onclick="join_room()"></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-2">
-                    <label style="padding-top: 10px;">Patient List: </label>
-                </div>
-                <div class="col-xs-10">
-                    <table class="table table-striped">
-                    <?php
-                        $query = "SELECT a.pc_roomlink, b.fname, b.lname, b.mname, b.phone_cell, b.email, CONCAT(pc_eventDate, ' ', pc_startTime) as pc_eventDateTime FROM openemr_postcalendar_events a INNER JOIN patient_data b ON a.pc_pid=b.id WHERE a.pc_aid=".$_SESSION['authUserID']." AND CONCAT(pc_eventDate, ' ', pc_startTime) >= NOW() ORDER BY a.pc_eventDate, pc_startTime, pc_endTime ASC";
-                        $res = sqlStatement($query);
-                        for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
-                    ?>
-                            <tr>
-                                <td style="padding-top:25px;"><?php echo ($iter+1); ?></td>
-                                <td><img src='./img/avatar.png'></td>
-                                <td style="padding-top:20px;">
-                                    <?php echo text($row['fname'])." ". text($row['mname']) . " " . text($row['lname']);?>
-                                    <br>
-                                    <?php echo text($row['pc_eventDateTime']);?>
-                                </td>
-                                <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Send a Message"></td>
-                                <td style="padding: 20px 5px;"><input type="button" class="form-control" value="Start Session" onclick="start_session('<?php echo text($row['pc_roomlink']);?>')"></td>
-                            </tr>
-                    <?php
-                        }
-                    ?>
-                    </table>
-                </div>
-            </div>
         </div>
     </body>
 </html>
