@@ -94,7 +94,7 @@ $alertmsg = '';
                                 <tr>
                                     <td style="width:150px;"><span class="text"><?php echo xlt('Patient Phone Number'); ?>: </span></td>
                                     <td style="width:320px;">
-                                        <input type="text" name="patient_phone" id="patient_phone" class="form-control" value="">
+                                        <input type="text" name="patient_phone" id="patient_phone" class="form-control" value="" placeholder="+17548022619">
                                     </td>
                                 </tr>
                                 <tr>

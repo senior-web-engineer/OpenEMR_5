@@ -188,6 +188,7 @@ if (empty($collectthis)) {
             $args['endtime'] = $endtime;
             $args['locationspec'] = $locationspec;
             $pc_eid = InsertEvent($args);
+
             return $pc_eid;
         }
     }
@@ -1728,7 +1729,7 @@ if ($GLOBALS['select_multi_providers']) {
         }
     }
 
-    echo "<select class='input-sm' name='form_provider' style='width:100%' />";
+    echo "<select class='input-sm' id='form_provider' name='form_provider' style='width:100%' onchange='change_provider()' >";
     while ($urow = sqlFetchArray($ures)) {
         echo "    <option value='" . attr($urow['id']) . "'";
         if ($urow['id'] == $defaultProvider) {
@@ -1934,17 +1935,17 @@ if ($repeatexdate != "") {
    <b><?php echo xlt('Roomlink'); ?>:</b>
   </td>
   <td colspan='4' nowrap>
-    <select class="form-control" name="form_roomlink" style="width:100%" size="1">
-        <option value=""></option>
-    <?php
-        $query = "SELECT * FROM rooms WHERE active = '1'";
-        $res = sqlStatement($query);
-        for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
-    ?>
-        <option value="<?php echo $row['room_link'];?>" <?php echo (attr($roomlink) == $row['room_link'])?'selected':''; ?>><?php echo $row['room_link']; ?></option>
-    <?php
-        }
-    ?>
+    <select class="form-control" id="form_roomlink" name="form_roomlink" style="width:100%" size="1">
+<!--        <option value=""></option>-->
+<!--    --><?php
+//        $query = "SELECT * FROM rooms WHERE active = '1'";
+//        $res = sqlStatement($query);
+//        for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
+//    ?>
+<!--        <option value="--><?php //echo $row['room_link'];?><!--" --><?php //echo (attr($roomlink) == $row['room_link'])?'selected':''; ?><!-->--><?php //echo $row['room_link']; ?><!--</option>-->
+<!--    --><?php
+//        }
+//    ?>
     </select>
    <!--input class='input-sm' type='text' size='128' name='form_roomlink' style='width:100%' value='<?php echo attr($roomlink); ?>' title='<?php echo xla('Optional information about this event');?>' /-->
   </td>
@@ -2173,6 +2174,41 @@ function deleteEvent() {
     return false;
 }
 
+function change_provider() {
+    var si = document.getElementById('form_provider');
+    if (si.selectedIndex >= 0) {
+        var catid = si.options[si.selectedIndex].value;
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo $GLOBALS['webroot']?>/interface/main/calendar/get_selected_room.php',
+            data: { user_id: catid },
+            dataType: 'json',
+            async: false,
+            success: function( data ) {
+                if (data.list != null && data.list.length > 0) {
+                    var tags = "";
+
+                    for (var i = 0; i < data.list.length; i ++) {
+                        if (i == 0) {
+                            tags += "<option value='" + data.list[i] + "' selected>" + data.list[i] + "</option>";
+                        } else {
+                            tags += "<option value='" + data.list[i] + "' >" + data.list[i] + "</option>";
+                        }
+                    }
+
+                    $('#form_roomlink').html(tags);
+                } else {
+                    $('#form_roomlink').html("");
+                }
+            },
+            // error: function (jqXHR, errdata, errorThrown) {
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+}
+
 function SubmitForm() {
     var f = document.forms[0];
     <?php if (!($GLOBALS['select_multi_providers']) && !$_GET['prov']) { // multi providers appt is not supported by check slot avail window, so skip. && is not provider tab. ?>
@@ -2213,6 +2249,9 @@ function SubmitForm() {
     return true;
 }
 
+$(document).ready(function () {
+    change_provider();
+})
 </script>
 
 </html>

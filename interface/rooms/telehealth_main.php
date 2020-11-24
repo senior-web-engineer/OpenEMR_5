@@ -150,15 +150,15 @@ if (isset($_REQUEST["mode"])) {
 
                 var platform = $("#platform").val();
                 if (platform == "WebRTC" || platform == "Twilio") {
-                    $("#zoom_teams_btn").hide();
+                    $("#zoom_teams_btn").val(platform);
                     $("#patient-list").show();
                 }
                 else if (platform == "Teams" || platform == "Zoom") {
-                    $("#zoom_teams_btn").show();
+                    $("#zoom_teams_btn").val(platform);
                     $("#patient-list").hide();
                 }
                 else {
-                    $("#zoom_teams_btn").show();
+                    $("#zoom_teams_btn").val("--Select--");
                     $("#patient-list").show();
                 }
 
@@ -176,16 +176,9 @@ if (isset($_REQUEST["mode"])) {
                 if (room_link == "")
                     return;
 
-                location.target = '_blank';
-                location.href=room_link;
-            }
-
-            function show_meetinglist() {
-                if ($("#meeting_list").css("display") == "table") {
-                    $("#meeting_list").hide();
-                } else {
-                    $("#meeting_list").show();
-                }
+                // location.target = '_blank';
+                // location.href=room_link;
+                window.open(room_link, '_blank');
             }
         </script>
         <style>
@@ -248,7 +241,7 @@ if (isset($_REQUEST["mode"])) {
                                                 </select>
                                             </td>
                                             <td >
-                                                <input type="button" class="form-control" id="zoom_teams_btn" value="ZOOM/TEAMS" onclick="open_room()">
+                                                <input type="button" class="form-control" id="zoom_teams_btn" value="--Select--" onclick="open_room()">
                                             </td>
                                         </tr>
                                         <tr>
@@ -265,7 +258,7 @@ if (isset($_REQUEST["mode"])) {
                                                                 <th class="text-center"></th>
                                                                 <th class="text-center">Name</th>
                                                                 <th class="text-center">Meeting Time</th>
-                                                                <th class="text-center">Ation</th>
+                                                                <th class="text-center">Action</th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
@@ -307,7 +300,8 @@ if (isset($_REQUEST["mode"])) {
                                                     <div class="iframe-container" style="overflow: hidden; width:360px; height:360px; position: relative; border: 1px solid #aaa;">
                                                         <iframe allow="microphone; camera" style="border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;" src="<?php echo $meetingurl; ?>" sandbox="allow-forms allow-scripts allow-same-origin" id="video-section"></iframe>
                                                     </div>
-                                                    <input type="button" class="form-control" style="margin-top: 10px; width: 360px;" value="Schedule Meetings" onclick="javascript:show_meetinglist()" />
+                                                    <!--<input type="button" class="form-control" style="margin-top: 10px; width: 360px;" value="Scheduled Meeting"/>-->
+                                                    <p class="form-control text-center" style="margin-top: 10px; width: 360px; background-color: rgb(38, 114, 236); color: white">Scheduled Meeting</p>
 
                                                     <table id="meeting_list" name="meeting_list" class="table" style="margin-top: 10px; width: 360px;">
                                                         <thead>
