@@ -6,11 +6,16 @@
 require_once("../globals.php");
 require_once("../../library/acl.inc");
 require_once("$srcdir/auth.inc");
-require_once("./twilio_api.php");
 
 use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Core\Header;
 use OpenEMR\Services\UserService;
+use Twilio\Rest\Client;
+
+$twilio_sid    = "AC6fee688eaec10e6686cafeb2352aa612";
+$twilio_token  = "33543e3f51d6346ecf04dce590a7aad0";
+$twilio_from = "+17548022619";
+
 
 if (!empty($_POST)) {
     if (!CsrfUtils::verifyCsrfToken($_POST["csrf_token_form"])) {
@@ -47,10 +52,10 @@ if (isset($_POST["mode"])) {
         if ($row)
             $room_link = $row['room_link'];
 
-        if ($platform == "Twilio") {
+        /*if ($platform == "Twilio") {
             $room = create_room();
             $room_link = $room['url'];
-        }
+        }*/
         echo $room_link;
     }
 
@@ -89,7 +94,25 @@ if (isset($_POST["mode"])) {
         $room_link = $_POST["invite_roomlink"];
         $invite_message = $_POST["invite_message"];
 
-        send_sms($patient_phone, $invite_message);
+        //send_sms($patient_phone, $invite_message);
+        $_to = $patient_phone;
+        if (substr($_to, 0, 1) != '+')
+            $_to = '+'.$_to;
+
+        $client = new Client($twilio_sid, $twilio_token);
+        $message = $client->messages->create(
+            $_to,
+            array(
+                'from' => $twilio_from,
+                'body' => $invite_message
+            )
+        );
+
+//        if ($message)
+//            //return $message->sid;
+//            echo $message->sid;
+//        else
+//            echo "false";
     }
 }
 
@@ -245,90 +268,34 @@ if (isset($_REQUEST["mode"])) {
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="6" style="padding-top: 20px;">
-                                                <div id="patient-list">
-                                                    <div class="">
-                                                        <label style="padding-top: 10px;">Patient List: </label>
-                                                    </div>
-                                                    <div class="">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                            <tr>
-                                                                <th>#</th>
-                                                                <th class="text-center"></th>
-                                                                <th class="text-center">Name</th>
-                                                                <th class="text-center">Meeting Time</th>
-                                                                <th class="text-center">Action</th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            <?php
-                                                            $query = "SELECT a.pc_roomlink, b.fname, b.lname, b.mname, b.phone_cell, b.email, CONCAT(pc_eventDate, ' ', pc_startTime) as pc_eventDateTime FROM openemr_postcalendar_events a INNER JOIN patient_data b ON a.pc_pid=b.id WHERE a.pc_aid=".$_SESSION['authUserID']." AND CONCAT(pc_eventDate, ' ', pc_startTime) >= NOW() ORDER BY a.pc_eventDate, pc_startTime, pc_endTime ASC";
-                                                            $res = sqlStatement($query);
-                                                            for ($iter = 0; $row = sqlFetchArray($res); $iter++) {
-                                                                ?>
-                                                                <tr>
-                                                                    <td style="padding-top:25px;"><?php echo ($iter+1); ?></td>
-                                                                    <td><img src='./img/avatar.png'></td>
-                                                                    <td style="padding-top:30px;" class="text-center">
-                                                                        <?php echo text($row['fname'])." ". text($row['mname']) . " " . text($row['lname']);?>
-                                                                    </td>
-                                                                    <td class="text-center" style="padding-top:30px;">
-                                                                        <?php echo text($row['pc_eventDateTime']);?>
-                                                                    </td>
-                                                                    <td style="padding: 20px 5px;display: flex;" class="text-center">
-                                                                        <input type="button" class="form-control" style=" width:50%" value="Send a Message">
-                                                                        <input type="button" class="form-control" style=" width:50%" value="Start Session" onclick="start_session('<?php echo $row['pc_roomlink'] ?>')">
-                                                                    </td>
-                                                                </tr>
-                                                                <?php
-                                                            }
-                                                            ?>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                            <td colspan="6" style="padding-top: 50px;">
+                                                <div>
+                                                    <label>Scheduled Meeting</label>
                                                 </div>
+                                                <table id="meeting_list" name="meeting_list" class="table" style="margin-top: 10px; width: 360px;">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="text-center" width="50%">Name</th>
+                                                        <th class="text-center" width="50%">Meeting Time</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <?php
+                                                    $res = sqlStatement("SELECT b.fname, CONCAT(a.pc_eventDate, ' ', a.pc_startTime) as pc_eventDateTime FROM openemr_postcalendar_events a INNER JOIN patient_data b ON a.pc_pid=b.id WHERE a.pc_aid=? AND DATE(a.pc_eventDate) = CURDATE() ORDER BY a.pc_eventDate, a.pc_startTime, a.pc_endTime ASC ", array($_SESSION['authUserID']));
+                                                    while ($row = sqlFetchArray($res)) {
+                                                        ?>
+                                                        <tr>
+                                                            <td class="text-center"><?php echo text($row['fname']) ?></td>
+                                                            <td class="text-center"><?php echo text($row['pc_eventDateTime']) ?></td>
+                                                        </tr>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                    </tbody>
+                                                </table>
                                             </td>
                                         </tr>
                                     </table>
-                                </td>
-                                <td style="vertical-align: top">
-                                    <div class="col-xs-2">
-                                        <table class="table">
-                                            <tr>
-                                                <td>
-                                                    <div class="iframe-container" style="overflow: hidden; width:360px; height:360px; position: relative; border: 1px solid #aaa;">
-                                                        <iframe allow="microphone; camera" style="border: 0; height: 100%; left: 0; position: absolute; top: 0; width: 100%;" src="<?php echo $meetingurl; ?>" sandbox="allow-forms allow-scripts allow-same-origin" id="video-section"></iframe>
-                                                    </div>
-                                                    <!--<input type="button" class="form-control" style="margin-top: 10px; width: 360px;" value="Scheduled Meeting"/>-->
-                                                    <p class="form-control text-center" style="margin-top: 10px; width: 360px; background-color: rgb(38, 114, 236); color: white">Scheduled Meeting</p>
-
-                                                    <table id="meeting_list" name="meeting_list" class="table" style="margin-top: 10px; width: 360px;">
-                                                        <thead>
-                                                        <tr>
-                                                            <th class="text-center" width="50%">Name</th>
-                                                            <th class="text-center" width="50%">Meeting</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        <?php
-                                                        $res = sqlStatement("SELECT b.fname, CONCAT(a.pc_eventDate, ' ', a.pc_startTime) as pc_eventDateTime FROM openemr_postcalendar_events a INNER JOIN patient_data b ON a.pc_pid=b.id WHERE a.pc_aid=? AND DATE(a.pc_eventDate) = CURDATE() ORDER BY a.pc_eventDate, a.pc_startTime, a.pc_endTime ASC ", array($_SESSION['authUserID']));
-                                                        while ($row = sqlFetchArray($res)) {
-                                                            ?>
-                                                            <tr>
-                                                                <td class="text-center"><?php echo text($row['fname']) ?></td>
-                                                                <td class="text-center"><?php echo text($row['pc_eventDateTime']) ?></td>
-                                                            </tr>
-                                                            <?php
-                                                        }
-                                                        ?>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                                <!--td><input type="button" class="form-control" value="Scheduled Meeting" onclick="join_room()"></td-->
-                                            </tr>
-                                        </table>
-                                    </div>
                                 </td>
                             </tr>
                             <!--

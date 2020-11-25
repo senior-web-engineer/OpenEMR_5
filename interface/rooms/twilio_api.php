@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "/twiliosdk/src/Twilio/autoload.php";
+//require __DIR__ . "/twiliosdk/src/Twilio/autoload.php";
 use Twilio\Rest\Client;
 
 $twilio_sid    = "AC6fee688eaec10e6686cafeb2352aa612";
