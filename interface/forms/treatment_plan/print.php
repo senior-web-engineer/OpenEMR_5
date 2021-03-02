@@ -226,11 +226,6 @@ include_once("$srcdir/api.inc");
 <!--ORIGINAL HEADER	<div class='header'>This is a header<hr></div>   -->
 	<div class='header'>
 	
-	
-	
-	
-	
-	
 	<!-- Info Header -->
 		<?php $obj = $formid ? formFetch("form_treatment_plan", $formid) : array();?>
 		<h1>Treatment Plan <?php if(($obj{"service_code"}) == "H0032TS") {echo "Review";} ?></h1>
@@ -268,7 +263,7 @@ include_once("$srcdir/api.inc");
 		<div id="content" class="form-group group">
 			<?php
 				
-				//$id = 0 + (isset($_GET['formid']) ? $_GET['formid'] : 0);
+				$id = 0 + (isset($_GET['formid']) ? $_GET['formid'] : 0);
 				//*************Diagnosis***************************************
 				echo "<h3>Diagnosis: </h3>";
 						$sql6 = "SELECT da.form_id, da.Description AS dadescription ".

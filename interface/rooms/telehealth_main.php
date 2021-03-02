@@ -12,6 +12,7 @@ use OpenEMR\Core\Header;
 use OpenEMR\Services\UserService;
 use Twilio\Rest\Client;
 
+
 $twilio_sid    = "AC6fee688eaec10e6686cafeb2352aa612";
 $twilio_token  = "33543e3f51d6346ecf04dce590a7aad0";
 $twilio_from = "+17548022619";
@@ -99,14 +100,33 @@ if (isset($_POST["mode"])) {
         if (substr($_to, 0, 1) != '+')
             $_to = '+'.$_to;
 
+        /*
         $client = new Client($twilio_sid, $twilio_token);
-        $message = $client->messages->create(
+        $message = $client->account->messages->create(
             $_to,
             array(
                 'from' => $twilio_from,
                 'body' => $invite_message
             )
         );
+        echo $message;
+        */
+        $accountSid = $twilio_sid;
+        $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $accountSid . '/Messages';
+        $data = [
+            'From' => $twilio_from,
+            'To' => $_to,
+            'Body' => $invite_message
+        ];
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+        curl_setopt($curl, CURLOPT_POSTFIELDS,http_build_query($data));
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_USERPWD, $accountSid . ":" . $twilio_token);
+        $response = curl_exec($curl);
+        curl_close($curl);
 
 //        if ($message)
 //            //return $message->sid;
@@ -118,7 +138,7 @@ if (isset($_POST["mode"])) {
 
 if (isset($_REQUEST["mode"])) {
     if ($_REQUEST["mode"] == "get_roomlink" || $_REQUEST["mode"] == "invite_room")
-        exit(text(trim($alertmsg)));
+        exit();
 }
 
 ?>

@@ -70,8 +70,7 @@ switch ($api){
 			approach_note = '" . add_escape_custom(getPost("approach_note",'')) .  "', 
 			IsCustom = " . add_escape_custom(getPost("IsCustom",0)) .  ",
 			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  ",
-			IsPrimary = " . add_escape_custom(getPost("IsPrimary",0)) .  "
-			";
+			IsPrimary = " . add_escape_custom(getPost("IsPrimary",0));
 		if (empty($id) || $id == -1) {
 		  $id = sqlInsert("INSERT INTO form_treatment_plan_problems SET $sets");
 		} else {
@@ -79,6 +78,15 @@ switch ($api){
 		}
 		$output = "{\"id\": \"$id\"}";
 		break;
+
+	case "saveproblemstab":
+		$sets = "tabIndx = " . add_escape_custom(getPost("tabIndx",0));
+		if (!empty($id) && $id != -1) {
+			sqlStatement("UPDATE form_treatment_plan_problems SET $sets WHERE id = ". add_escape_custom("$id"). "");
+		}
+		$output = "{\"id\": \"$id\"}";
+		break;
+
     case "saveproblemprimary": 
 		//sqlStatement("UPDATE form_treatment_plan_problems SET IsPrimary = 0 WHERE form_id = ". add_escape_custom(getPost("form_id",0)). "");
 		//sqlStatement("UPDATE form_treatment_plan_problems SET IsPrimary = 1 WHERE id = ". add_escape_custom("$id"). "");
@@ -141,8 +149,8 @@ switch ($api){
 			IsCustom = " . add_escape_custom(getPost("IsCustom",0)) .  ", 
 			IsEvidenceBased = " . add_escape_custom(getPost("IsEvidenceBased",0)) .  " ,
 			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  ",
-			problem_id = " . add_escape_custom(getPost("problem_id",0)) .  "
-			";
+			problem_id = " . add_escape_custom(getPost("problem_id",0)) .  ",
+			goals_id = " . add_escape_custom(getPost("goals_id", 0)) . "";
 		if (empty($id) || $id == -1) {
 		  $id = sqlInsert("INSERT INTO form_treatment_plan_objectives SET $sets ");
 		} else {
@@ -204,7 +212,8 @@ switch ($api){
 			form_id = " . add_escape_custom(getPost("form_id",0)) .  ", 
 			user = '" . $_SESSION["authUser"] . "',
 			Notes = '" . add_escape_custom(getPost("Notes",'')) .  "',
-			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  "
+			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  ",
+			problem_id = " . add_escape_custom(getPost("problem_id",0)) .  "
 			";
 		if (empty($id) || $id == -1) {
 		  $id = sqlInsert("INSERT INTO form_treatment_plan_modalitynotes SET $sets ");
@@ -218,7 +227,8 @@ switch ($api){
 			form_id = " . add_escape_custom(getPost("form_id",0)) .  ", 
 			user = '" . $_SESSION["authUser"] . "',
 			Criteria = '" . add_escape_custom(getPost("Criteria",'')) .  "',
-			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  "
+			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  ",
+			problem_id = " . add_escape_custom(getPost("problem_id",0)) .  "
 			";
 		if (empty($id) || $id == -1) {
 		  $id = sqlInsert("INSERT INTO form_treatment_plan_dischargecriteria SET $sets ");
@@ -228,7 +238,7 @@ switch ($api){
 		$output = "{\"id\": \"$id\"}";
 		break;
 
-		case "savestrength":
+	case "savestrength":
 		$sets = "pid = {$_SESSION["pid"]},
 			form_id = " . add_escape_custom(getPost("form_id",0)) .  ", 
 			user = '" . $_SESSION["authUser"] . "',
@@ -243,7 +253,7 @@ switch ($api){
 		}
 		$output = "{\"id\": \"$id\"}";
 		break;
-		case "saveweakness":
+	case "saveweakness":
 		$sets = "pid = {$_SESSION["pid"]},
 			form_id = " . add_escape_custom(getPost("form_id",0)) .  ", 
 			user = '" . $_SESSION["authUser"] . "',
@@ -258,7 +268,7 @@ switch ($api){
 		}
 		$output = "{\"id\": \"$id\"}";
 		break;
-		case "savesummary":
+	case "savesummary":
 		$sets = "pid = {$_SESSION["pid"]},
 			form_id = " . add_escape_custom(getPost("form_id",0)) .  ", 
 			user = '" . $_SESSION["authUser"] . "',
@@ -278,13 +288,13 @@ switch ($api){
 		$sets = "pid = {$_SESSION["pid"]},
 			form_id = " . add_escape_custom(getPost("form_id",0)) .  ", 
 			LegalCode = '" . add_escape_custom(getPost("LegalCode",'')) .  "',
-			GroupID = " . add_escape_custom(getPost("GroupID",0)) .  ",
 			Description = '" . add_escape_custom(getPost("Description",'')) .  "',
 			Axis = '" . add_escape_custom(getPost("Axis",'')) .  "',
 			cgaf_score = '" . add_escape_custom(getPost("cgaf_score",'')) .  "',
 			pgaf_score = '" . add_escape_custom(getPost("pgaf_score",'')) .  "',
 			stress_rating = '" . add_escape_custom(getPost("stress_rating",'')) .  "',
-			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  "
+			IsDeleted = " . add_escape_custom(getPost("IsDeleted",0)) .  ",
+			problem_id = " . add_escape_custom(getPost("problem_id",0)) .  "
 			";
 		if (empty($id) || $id == -1) {
 		  $id = sqlInsert("INSERT INTO form_treatment_plan_diagnosis SET $sets ");

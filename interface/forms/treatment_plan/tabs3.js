@@ -6,7 +6,7 @@ $(function () {
     var GroupID = 0;
     var ProblemNumber = 0;
     var ObjectiveNumber = 0;
-
+    
     //load form
     var loadProblemSelector = function () {
         var options = "<option value='-1'>Please choose...</option>";
@@ -329,20 +329,24 @@ $(function () {
                 if (_.isUndefined(obj)) { obj = _.findWhere(oDiagnosis, { id: id + "" }); }
                 if (!_.isUndefined(obj)) {
                     if (parseInt(obj.GroupID) <= 0) { obj.GroupID = obj.GroupID; }// Changed obj.GroupID = GroupID To obj.GroupID = '400' for testing
-                    if (parseInt(obj.ProblemNumber) <= 0) { obj.ProblemNumber = ProblemNumber; }
+/*Yves*/			if (parseInt(obj.ProblemNumber) <= 0) { obj.ProblemNumber = ProblemNumber; }																			
                     fillDiagnosis(obj);
-		      disableTextBox("diagnosis_Description",obj.DiagnosisNumber);
+		    //  disableTextBox("diagnosis_Description",obj.DiagnosisNumber);
                     var tiVM = ko.contextFor($("#diagnosis_Description").get(0)).$data;
                     tiVM.updateControl({
                         id: 'diagnosis_Description',
                         page: 'treatment_plan/edit.php',
                         storeid: ['diagnosis_LegalCode'],
                         appendvalue: false,
-                      //params: { id1: form_id, id2: GroupID, id4: ProblemNumber}
+                    //Yves    params: { id1: form_id }
+					//	params: { id1: GroupID, id4: ProblemNumber }
 						params: { id1: GroupID, id4: form_id, id5: ProblemNumber}
                     });
                 }
                 break;
+				
+				
+				
             case "diagnosis2_item":
                 var obj = _.findWhere(oDiagnosis2, { id: id });
                 if (_.isUndefined(obj)) { obj = _.findWhere(oDiagnosis2, { id: id + "" }); }
@@ -1107,10 +1111,26 @@ $(function () {
     //Diagnosis
     $("#addDiagnosis").click(function () {
         //create & reload or set everything to blank ID's
-        var obj = { id: -1 };
+        var obj = { id: -1, tp_problem_number: tp_problem_number,
+                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+                problem_id: problem_id
+				};
         oDiagnosis.push(obj);
         itemAddEditor("diagnosis_item", this);
     });
+	/*
+	$("#addGoal").click(function () {
+        if (problemCheck()) {
+            //create & reload or set everything to blank ID's
+            var obj = { id: -1, tp_problem_number: tp_problem_number,
+                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+                problem_id: problem_id
+            };
+            oGoals.push(obj);
+            itemAddEditor("goal_item", this);
+        }
+    });
+	*/
     $(".postdiagnosis").click(function () {
         //top.restoreSession(); //figure out how to get this to work
         var action = $(this).attr("action");
@@ -1134,9 +1154,40 @@ $(function () {
                 } 
             }
             //update list
-            loadList("diagnosis_list", "diagnosis_item", oDiagnosis);
+            loadList("diagnosis_list", "diagnosis_item", oDiagnosis, { tp_problem_number: tp_problem_number });
         });
     });
+	/*
+	$(".postobjective").click(function () {
+        //top.restoreSession(); //figure out how to get this to work
+        var action = $(this).attr("action");
+        if (action === "delete"){
+            if (!confirm("Are you sure you want to delete this Objective?")){ return; }
+            objectives_IsDeleted = 1; //set the delete flag for scrape
+        }
+        $(this).closest(".editor").toggleClass('hidden');
+        postObjective(function () {
+            //scrape into collection
+            clearLists('interventions_list');
+            var obj = scrapeObjectives();
+            //errors("scraped objective => " + JSON.stringify(obj) + "<br/><br/>");
+            var objIdx = -1;
+            _.each(oObjectives, function (element, index, list) {
+                if (parseInt(element.id) === parseInt(obj.id) || parseInt(element.id) === -1) { objIdx = index; }
+            });
+            if (objIdx >= 0){
+                if (action === "delete"){
+                    oObjectives.splice(objIdx,1);
+                } else { 
+                    oObjectives[objIdx] = obj; //replace the node
+                } 
+            }
+            //errors("updated objectives => " + JSON.stringify(oObjectives) + "<br/><br/>");
+            //update list
+            loadList("objectives_list", "objective_item", oObjectives, { tp_problem_number: tp_problem_number });
+        });
+    });
+	*/
     //Diagnosis2
     $("#addDiagnosis2").click(function () {
         //create & reload or set everything to blank ID's

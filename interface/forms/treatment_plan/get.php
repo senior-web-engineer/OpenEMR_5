@@ -46,7 +46,7 @@ switch ($api){
 	case "getproblems":
         $rows = array();
 		$sql = "SELECT id, pid, form_id, tp_problem_number, GroupID, 
-					ProblemNumber, Description, approach_note, IsCustom, IsPrimary 
+					ProblemNumber, Description, approach_note, IsCustom, IsPrimary, tabIndx 
 				FROM openemr.form_treatment_plan_problems 
 				WHERE (IsDeleted = 0 or IsDeleted is null) 
 					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "
@@ -87,13 +87,14 @@ switch ($api){
 		break;
 	case "getobjectives":
         $rows = array();
-		$sql = "SELECT id, pid, form_id, tp_problem_number, target_date, 
+		$sql = "SELECT id, pid, form_id, goals_id, tp_problem_number, target_date, 
 					sessions, IsCritical, GroupID, ProblemNumber, ObjectiveNumber,
 					Description, IsCustom, IsEvidenceBased
 				FROM openemr.form_treatment_plan_objectives
 				WHERE (IsDeleted = 0 or IsDeleted is null) 
 					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . " 
-					and problem_id = " . add_escape_custom(getPost("problem_id",0)) . "";
+					and problem_id = " . add_escape_custom(getPost("problem_id",0)) . "
+					and goals_id = " . add_escape_custom(getPost("goals_id", 0)) . "";
         $res = sqlStatement($sql);
         while($row = SqlFetchArray($res)){
             $rows['list'][] = $row;
@@ -131,7 +132,8 @@ switch ($api){
 		$sql = "SELECT id, pid, form_id, user, start_date, end_date, modality, hcpt, intervals, frequency, duration_hour, duration_minute, provider, Description
 				FROM openemr.form_treatment_plan_modalities
 				WHERE (IsDeleted = 0 or IsDeleted is null) 
-					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "";
+					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "
+					and problem_id = " . add_escape_custom(getPost("problem_id",0)) ."";
         $res = sqlStatement($sql);
         while($row = SqlFetchArray($res)){
             $rows['list'][] = $row;
@@ -143,7 +145,8 @@ switch ($api){
 		$sql = "SELECT id, pid, form_id, Notes, user
 				FROM openemr.form_treatment_plan_modalitynotes
 				WHERE (IsDeleted = 0 or IsDeleted is null) 
-					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "";
+					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "
+					and problem_id = " . add_escape_custom(getPost("problem_id",0)) ."";
         $res = sqlStatement($sql);
         while($row = SqlFetchArray($res)){
             $rows['list'][] = $row;
@@ -155,7 +158,8 @@ switch ($api){
 		$sql = "SELECT id, pid, form_id, Criteria, user
 				FROM openemr.form_treatment_plan_dischargecriteria
 				WHERE (IsDeleted = 0 or IsDeleted is null) 
-					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "";
+					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "
+					and problem_id = " . add_escape_custom(getPost("problem_id",0)) . "";
         $res = sqlStatement($sql);
         while($row = SqlFetchArray($res)){
             $rows['list'][] = $row;
@@ -208,6 +212,7 @@ switch ($api){
 				FROM openemr.form_treatment_plan_diagnosis
 				WHERE (IsDeleted = 0 or IsDeleted is null) 
 					and axis = " . getPost("axis",0) . "  
+					and problem_id = " . add_escape_custom(getPost("problem_id",0)) . "
 					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . "";
         $res = sqlStatement($sql);
         while($row = SqlFetchArray($res)){

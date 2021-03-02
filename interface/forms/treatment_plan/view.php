@@ -88,7 +88,7 @@ $provider_results = sqlQuery("select fname, mname, lname, supervisor from users 
 <!--<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/js/jquery-1.10.1.min.js"></script>-->
 <!--<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/js/common.js"></script>-->
 <script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/js/fancybox-2.1.5/jquery.fancybox.pack.js"></script>
-<script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/js/jquery-ui.js"></script>
+<!-- <script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/js/jquery-ui.js"></script> -->
 <script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/js/signaturepad/SigWebTablet.js"></script>
 
 <!-- Updated by dnunez 6/29/16-->
@@ -101,25 +101,26 @@ $provider_results = sqlQuery("select fname, mname, lname, supervisor from users 
 $(document).ready(function() {
 	
 	$(".various").fancybox({
-		maxWidth	: 800,
-		maxHeight	: 600,
+		maxWidth	: 1400,
+		maxHeight	: 1000,
 		fitToView	: false,
-		width		: '70%',
-		height		: '70%',
+		width		: '100%',
+		height		: '100%',
 		autoSize	: false,
 		closeClick	: false,
 		openEffect	: 'none',
-		closeEffect	: 'none'
+		closeEffect	: 'none',
+		type: 'iframe'
 	});
 	
 	$(".medium_modal").fancybox( {
 		openEffect: 'elastic',
 	    closeEffect: 'elastic',
 	    fitToView: false,
-	    width: "90%",
-	    maxWidth: 1080,
-	    height: "95%",
-	    type: 'iframe'
+	    width: "100%",
+	    height: "100%",
+	    type: 'iframe',
+	    autoSize: false
 	});
 
 	$(".small_modal").fancybox( {
@@ -162,7 +163,8 @@ $(document).ready(function() {
 			</div>
 		</div>
 	    <div class="list-group">
-			<a href="<?php echo "$web_root";?>/interface/forms/treatment_plan/tabs3.php?dev=1&formid=<?php echo "$formid";?>" class="iframe medium_modal list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Click Here to edit Treatment Plan</a>
+			<a href="<?php echo "$web_root";?>/interface/forms/treatment_plan/tabs3.php?dev=1&formid=<?php echo "$formid";?>" class="iframe medium_modal list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Click here to use Treatment Plan builder</a>
+			<a href="<?php echo "$web_root";?>/interface/forms/treatment_plan/edit.php?dev=1&formid=<?php echo "$formid";?>" class="iframe medium_modal list-group-item"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Click Here to edit Treatment Plan</a>
 	        <a href="<?php echo "$web_root";?>/interface/forms/treatment_plan/patient_signature.php?dev=1&formid=<?php echo "$formid";?>" class="various list-group-item" data-fancybox-type="iframe"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Click Here for Patient Signature Page</a>
 	       	<a href="<?php echo "$web_root";?>/interface/forms/treatment_plan/guardian_signature.php?dev=1&formid=<?php echo "$formid";?>" class="various list-group-item" data-fancybox-type="iframe"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Click Here for Guardian Signature Page</a>
 	       	<a href="<?php echo "$web_root";?>/interface/forms/treatment_plan/provider_signature.php?dev=1&formid=<?php echo "$formid";?>" class="various list-group-item" data-fancybox-type="iframe"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Click Here for Provider Signature Page</a>
