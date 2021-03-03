@@ -242,7 +242,7 @@ function changeProblem(problemId) {
         
         clearBehavior();
         clearObjective();
-        clearInvention();
+        clearIntervention();
         clearModality();
         clearModalityNote();
         clearDischarge();
