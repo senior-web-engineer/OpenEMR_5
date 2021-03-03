@@ -4,7 +4,7 @@ let selectedObjectiveId = -1;
 let maxObjective = 1;
 let arrObjective = [];
 let selectedObjectiveGoalId = -1;
-
+let loadingObjective = false;
 
 function loadObjectiveHeading() {
 
@@ -48,6 +48,7 @@ function loadGoalList() {
 }
 
 function changeGoal(goalId) {
+    console.log(goalId);
     if (goalId > -1) {
         const selectedGoal = findGoalById(goalId);
         const { ProblemNumber, GroupID } = selectedGoal;
@@ -57,7 +58,7 @@ function changeGoal(goalId) {
     } else {
         $("#btn-add-objective").attr('disabled', true);
     }
-
+    
     selectedObjectiveGoalId = goalId;
 }
 
@@ -99,7 +100,9 @@ function loadObjectiveOptions(problemNumber, groupID) {
 
 
 function loadObjective(goalId) {
-    
+    console.log('..loading');
+    loadingObjective = true;
+
     if (selectedProblemId < 0) {
         return;
     }
@@ -112,7 +115,7 @@ function loadObjective(goalId) {
         success: function(resData){
 
         // $.post(loadPath, params, function(resData){
-        
+            console.log('loaded');
             maxObjective = 1;
             arrObjective = resData.data.list;
             let objectiveContents = "";
@@ -169,7 +172,10 @@ function loadObjective(goalId) {
             if (isChangingProblem) {
                 checkAllLoaded();
             }
-    
+            loadingObjective = false;
+        },
+        error: function(xhr, status, error){
+            loadingObjective = false;
         }
     })
 

@@ -71,14 +71,16 @@ $(function() {
             case 3:
                 if (!arrObjective || arrObjective.length < 1) {
                     isValid = false;
-                    alert('There are no objectives for selected goal .');
+                    if (!loadingObjective) {
+                        alert('There are no objectives for selected goal .');
+                    }
                 }
                 break;
-            case 4:
+            case 5:
                 if (!arrModality || arrModality.length < 1)
                     isValid = false;
                 break;
-            case 5:
+            case 6:
                 if (!arrModalityNote || arrModalityNote.length < 1) 
                     isValid = false;
                 break;

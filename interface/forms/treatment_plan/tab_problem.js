@@ -258,9 +258,6 @@ function changeProblem(problemId) {
     loadGoalOptions(selectedProblem.ProblemNumber, selectedProblem.GroupID);
     loadGoal();
 
-    loadObjectiveOptions(selectedProblem.ProblemNumber, selectedProblem.GroupID);
-    loadObjective();
-
     loadModality();
     loadModalityNotes();
     
