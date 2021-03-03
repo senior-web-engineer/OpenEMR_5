@@ -270,7 +270,7 @@ function changeProblem(problemId) {
 }
 
 function checkAllLoaded() {
-    if (totalLoadCnt >= 10) {
+    if (totalLoadCnt >= 8) {
         gotoStep(currTab);
         isChangingProblem = false;
         $('#loading').modal('hide');

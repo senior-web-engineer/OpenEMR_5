@@ -48,7 +48,6 @@ function loadGoalList() {
 }
 
 function changeGoal(goalId) {
-    console.log(goalId);
     if (goalId > -1) {
         const selectedGoal = findGoalById(goalId);
         const { ProblemNumber, GroupID } = selectedGoal;
@@ -100,7 +99,6 @@ function loadObjectiveOptions(problemNumber, groupID) {
 
 
 function loadObjective(goalId) {
-    console.log('..loading');
     loadingObjective = true;
 
     if (selectedProblemId < 0) {
@@ -115,7 +113,6 @@ function loadObjective(goalId) {
         success: function(resData){
 
         // $.post(loadPath, params, function(resData){
-            console.log('loaded');
             maxObjective = 1;
             arrObjective = resData.data.list;
             let objectiveContents = "";
