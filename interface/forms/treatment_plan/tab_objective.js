@@ -48,17 +48,17 @@ function loadGoalList() {
 }
 
 function changeGoal(goalId) {
+    selectedObjectiveGoalId = goalId;
+
     if (goalId > -1) {
         const selectedGoal = findGoalById(goalId);
         const { ProblemNumber, GroupID } = selectedGoal;
 
         loadObjectiveOptions(ProblemNumber, GroupID);
-        loadObjective(goalId);
+        loadObjective();
     } else {
         $("#btn-add-objective").attr('disabled', true);
     }
-    
-    selectedObjectiveGoalId = goalId;
 }
 
 function loadObjectiveOptions(problemNumber, groupID) {
@@ -98,14 +98,14 @@ function loadObjectiveOptions(problemNumber, groupID) {
 }
 
 
-function loadObjective(goalId) {
+function loadObjective() {
     loadingObjective = true;
 
     if (selectedProblemId < 0) {
         return;
     }
 
-    const params = { form_id : form_id, api: 'getobjectives', problem_id: selectedProblemId, goals_id: goalId };
+    const params = { form_id : form_id, api: 'getobjectives', problem_id: selectedProblemId };
     $.ajax({
         url: loadPath,
         type: 'POST',
@@ -116,11 +116,14 @@ function loadObjective(goalId) {
             maxObjective = 1;
             arrObjective = resData.data.list;
             let objectiveContents = "";
-            selectedObjectiveId = -1;
-
+            
             if (arrObjective) {
 
                 arrObjective.forEach(function(element) {
+                    // If not objective of selected goal, then return
+                    if (element.goals_id != selectedObjectiveGoalId) {
+                        return;
+                    }
 
                     objectiveContents += '<a href="#" class="list-group-item list-group-item-action" id="objective-content_' + element.id +'">';
 //                   objectiveContents += '<a href="#" class="list-group-item list-group-item-action" id="objective-content_' + element.id +'" onclick="changeObjective(' + element.id + ',' + element.ObjectiveNumber + ')">';
@@ -225,7 +228,7 @@ function saveObjective() {
     }
 
     $.post(savePath, params, function(response){
-        loadObjective(selectedObjectiveGoalId);
+        loadObjective();
         $('#objective-modal').modal('hide');
     });
 }
@@ -273,7 +276,7 @@ function deleteObjective(id) {
     params.api = "saveobjectives"
 
     $.post(savePath, params, function(){
-        loadObjective(selectedObjectiveGoalId);
+        loadObjective();
         $('#objective-modal').modal('hide');
     });
 

@@ -93,8 +93,7 @@ switch ($api){
 				FROM openemr.form_treatment_plan_objectives
 				WHERE (IsDeleted = 0 or IsDeleted is null) 
 					and pid = {$_SESSION["pid"]} and form_id = " . getPost("form_id",-1) . " 
-					and problem_id = " . add_escape_custom(getPost("problem_id",0)) . "
-					and goals_id = " . add_escape_custom(getPost("goals_id", 0)) . "";
+					and problem_id = " . add_escape_custom(getPost("problem_id",0)) . "";
         $res = sqlStatement($sql);
         while($row = SqlFetchArray($res)){
             $rows['list'][] = $row;
