@@ -54,7 +54,7 @@ use OpenEMR\Core\Header;
 </head>
 <body class="skin-blue fixed">
     <header class="header">
-        <a href="home.php" class="logo"><img src='<?php echo $GLOBALS['images_static_relative']; ?>/logo-full-con.png'/></a>
+        <a href="home.php" class="logo hidden-xs"><img src='<?php echo $GLOBALS['images_static_relative']; ?>/logo-full-con.png'/></a>
         <nav class="navbar navbar-static-top" role="navigation">
             <!-- Sidebar toggle button-->
             <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas"
@@ -98,7 +98,7 @@ use OpenEMR\Core\Header;
                             <?php if ($GLOBALS['allow_portal_chat']) { ?>
                                 <a href="<?php echo $GLOBALS['web_root']; ?>/portal/messaging/secure_chat.php?fullscreen=true"> <i class="fa fa-user fa-fw pull-right"></i><?php echo xlt('Chat'); ?></a>
                                 <?php } ?>
-                                <a href="#openSignModal" data-toggle="modal" data-backdrop="true" data-target="#openSignModal" data-type="patient-signature"> <i class="fa fa-cog fa-fw pull-right"></i> <?php echo xlt('Settings'); ?></a></li>
+                                <a href="javascript:changeCredentials(event)"> <i class="fa fa-cog fa-fw pull-right"></i> <?php echo xlt('Change Credentials'); ?></a></li>
 
                             <li class="divider"></li>
 
@@ -124,7 +124,6 @@ use OpenEMR\Core\Header;
                         <p><?php echo xlt('Welcome') . ' ' . text($result['fname']." ".$result['lname']); ?></p>
                         <a href="#"><i class="fa fa-circle text-success"></i> <?php echo xlt('Online'); ?></a>
                     </div>
-
                 </div>
                 <ul class="nav nav-pills nav-stacked" style='font-color:#fff;'><!-- css class was sidebar-menu -->
                     <li data-toggle="pill"><a href="#profilepanel" data-toggle="collapse"
@@ -135,9 +134,6 @@ use OpenEMR\Core\Header;
                     </a></li>
                     <li><a href="<?php echo $GLOBALS['web_root']; ?>/portal/patient/onsitedocuments?pid=<?php echo attr_url($pid); ?>"> <i class="fa fa-gavel"></i>
                             <span><?php echo xlt('Patient Documents'); ?></span>
-                    </a></li>
-                    <li><a href="<?php echo $GLOBALS['web_root']; ?>/interface/forms/treatment_plan/print_portal.php?id=14"> <i class="fa fa-calendar-o"></i>
-                            <span><?php echo xlt('Patient Treatment Plan'); ?></span>
                     </a></li>
                     <?php if ($GLOBALS['allow_portal_appointments']) { ?>
                         <li data-toggle="pill"><a href="#appointmentpanel" data-toggle="collapse"

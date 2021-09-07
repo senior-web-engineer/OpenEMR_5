@@ -6,18 +6,26 @@
  * @link      http://www.open-emr.org
  * @author    Jerry Padgett <sjpadgett@gmail.com>
  * @author    Brady Miller <brady.g.miller@gmail.com>
- * @copyright Copyright (c) 2017 Jerry Padgett <sjpadgett@gmail.com>
+ * @copyright Copyright (c) 2017-2019 Jerry Padgett <sjpadgett@gmail.com>
  * @copyright Copyright (c) 2019 Brady Miller <brady.g.miller@gmail.com>
  * @license   https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
  */
+
 /* Library functions for register*/
+
+use OpenEMR\Common\Crypto\CryptoGen;
+use OpenEMR\Common\Utils\RandomGenUtils;
 
 function notifyAdmin($pid, $provider)
 {
 
-    $note = xl("New patient registration received from patient portal. Reminder to check for possible new appointment");
-    $title = xl("New Patient");
+    $note = xlt("New patient registration received from patient portal. Reminder to check for possible new appointment");
+    $title = xlt("New Patient");
     $user = sqlQueryNoLog("SELECT users.username FROM users WHERE authorized = 1 And id = ?", array($provider));
+
+    if (empty($user['username'])) {
+        $user['username'] = "portal-user";
+    }
 
     $rtn = addPnote($pid, $note, 1, 1, $title, $user['username'], '', 'New');
 
@@ -26,28 +34,53 @@ function notifyAdmin($pid, $provider)
 
 function isNew($dob = '', $lname = '', $fname = '', $email = '')
 {
-    $last = '%' . trim($lname) . '%';
-    $first = '%' . trim($fname) . '%';
-    $dob = '%' . trim($dob) . '%';
-    $semail = '%' . trim($email) . '%';
+    // no sense doing a weighted search because we want specific criteria
+    // for new patients. Mainly catch those trying to just get a new password.
+    // or change email.
+    $last = trim(urldecode($lname));
+    $first = trim(urldecode($fname));
+    $dob = trim(urldecode($dob));
+    $semail = trim(urldecode($email));
+    // first check email both contact and secure
+    if ($email) {
+        $sql = "select pid from patient_data " .
+            "Where (patient_data.email LIKE ? OR patient_data.email_direct LIKE ?) " .
+            "And patient_data.DOB LIKE ? order by date limit 0,1";
+        $data = array(
+            $semail,
+            $semail,
+            $dob
+        );
+        $tier1 = sqlQuery($sql, $data);
+        if (!empty($tier1['pid'])) {
+            // email with this dob already on file so, skedaddle ...
+            return $tier1['pid'];
+        }
+    }
+    // fully matched for our purposes
+    $sql = "select pid from patient_data Where patient_data.lname LIKE ? And patient_data.fname LIKE ? And patient_data.DOB LIKE ? And (patient_data.email LIKE ? OR patient_data.email_direct LIKE ?) order by date limit 0,1";
+    $data = array(
+        $last,
+        $first,
+        $dob,
+        $semail,
+        $semail
+    );
+    $tier2 = sqlQuery($sql, $data);
+    if (!empty($tier2['pid'])) {
+        return $tier2['pid'];
+    }
+    // name and dob match. Most likely trying to change email!
+    // too much of a coincidence...
     $sql = "select pid from patient_data Where patient_data.lname LIKE ? And patient_data.fname LIKE ? And patient_data.DOB LIKE ? order by date limit 0,1";
     $data = array(
         $last,
         $first,
         $dob
     );
-    if ($email) {
-        $sql = "select pid from patient_data Where patient_data.lname LIKE ? And patient_data.fname LIKE ? And patient_data.DOB LIKE ? And patient_data.email LIKE ? order by date limit 0,1";
-        $data = array(
-            $last,
-            $first,
-            $dob,
-            $semail
-        );
-    }
-    $row = sqlQuery($sql, $data);
+    $tier3 = sqlQuery($sql, $data);
 
-    return $row['pid'] ? $row['pid'] : 0;
+    return $tier3['pid'] ? $tier3['pid'] : 0;
 }
 
 function saveInsurance($pid)
@@ -100,27 +133,6 @@ function getNewPid()
     return $newpid;
 }
 
-function generatePassword($length = 8, $strength = 1)
-{
-    $consonants = 'bdghjmnpqrstvzacefiklowxy';
-    $numbers = '0234561789';
-    $specials = '@#$%';
-
-    $password = '';
-    $alt = time() % 2;
-    for ($i = 0; $i < $length / 3; $i ++) {
-        if ($alt == 1) {
-            $password .= $consonants[(rand() % strlen($consonants))] . $numbers[(rand() % strlen($numbers))] . $specials[(rand() % strlen($specials))];
-            $alt = 0;
-        } else {
-            $password .= $numbers[(rand() % strlen($numbers))] . $specials[(rand() % strlen($specials))] . $consonants[(rand() % strlen($consonants))];
-            $alt = 1;
-        }
-    }
-
-    return $password;
-}
-
 function validEmail($email)
 {
     if (preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/i", $email)) {
@@ -130,19 +142,16 @@ function validEmail($email)
     return false;
 }
 
-function messageCreate($uname, $pass)
+function messageCreate($uname, $pass, $encoded_link = '')
 {
-    $message = xlt("Patient Portal Web Address") . ":<br>";
-
-    if ($GLOBALS['portal_onsite_two_enable']) {
-        $message .= "<a href='" . attr($GLOBALS['portal_onsite_two_address']) . "'>" .
-            text($GLOBALS['portal_onsite_two_address']) . "</a><br>";
-    }
-
-    $message .= "<br>";
-
-    $message .= xlt("User Name") . ": " . text($uname) .
-    "<br><br>" . xlt("Password") . ": " . text($pass) . "<br><br>";
+    $message = '<p>' . xlt("We received a credentials reset request. The link to reset your credentials is below.") . '</p>';
+    $message .= '<p>' . xlt("Please ignore this email if you did not make this request") . '</p>';
+    $message .= '<p><strong>' . xlt("Credentials Reset. Below link is only valid for one hour.") . ": </strong></p>";
+    $message .= sprintf('<a href="%s">%s</a>', attr($encoded_link), text($encoded_link));
+    $message .= "<p><strong>" . xlt("One Time verification PIN") . ": </strong>" . text($pass) . "</p>";
+    $message .= "<p><strong>" . xlt("Your Portal Login Web Address. Bookmark for future logins.") . ": </strong></p>";
+    $message .= '<a href=' . attr($GLOBALS['portal_onsite_two_address']) . '>' . text($GLOBALS['portal_onsite_two_address']) . "</a><br>";
+    $message .= "<p>" . xlt("Thank You.") . "</p>";
 
     return $message;
 }
@@ -152,42 +161,58 @@ function doCredentials($pid)
     global $srcdir;
     require_once("$srcdir/authentication/common_operations.php");
 
-    $newpd = sqlQuery("SELECT * FROM `patient_data` WHERE `pid`=?", array(
-        $pid
-    ));
+    $newpd = sqlQuery("SELECT id,fname,mname,lname,email,email_direct, providerID FROM `patient_data` WHERE `pid`=?", array($pid));
+    $user = sqlQueryNoLog("SELECT users.username FROM users WHERE authorized = 1 And id = ?", array($newpd['providerID']));
 
-    $clear_pass = generatePassword();
 
+    $crypto = new CryptoGen();
     $uname = $newpd['fname'] . $newpd['id'];
+    // Token expiry 1 hour
+    $expiry = new DateTime('NOW');
+    $expiry->add(new DateInterval('PT01H'));
 
-    $res = sqlStatement("SELECT * FROM patient_access_onsite WHERE pid=?", array(
-        $pid
-    ));
-    $query_parameters = array(
-        $uname
-    );
-    $salt_clause = "";
-    // For onsite portal create a blowfish based hash and salt.
+    $clear_pass = RandomGenUtils::generatePortalPassword();
+    $token_new = RandomGenUtils::createUniqueToken(32);
+    $pin = RandomGenUtils::createUniqueToken(6);
+
+    // Will send a link to user with encrypted token
+    $token = $crypto->encryptStandard($token_new);
+    if (empty($token)) {
+        // Serious issue if this is case, so die.
+        error_log('OpenEMR Error : Portal token encryption broken - exiting');
+        die();
+    }
+    $encoded_link = sprintf("%s?%s", attr($GLOBALS['portal_onsite_two_address']), http_build_query([
+        'forward' => $token,
+        'site' => $_SESSION['site_id']
+    ]));
+
+    // Will store unencrypted token in database with the pin and expiration date
+    $one_time = $token_new . $pin . bin2hex($expiry->format('U'));
+    $res = sqlStatement("SELECT * FROM patient_access_onsite WHERE pid=?", array($pid));
+    $query_parameters = array($uname, $one_time);
     $new_salt = oemr_password_salt();
     $salt_clause = ",portal_salt=? ";
     array_push($query_parameters, oemr_password_hash($clear_pass, $new_salt), $new_salt);
     array_push($query_parameters, $pid);
     if (sqlNumRows($res)) {
-        sqlStatement("UPDATE patient_access_onsite SET portal_username=?,portal_pwd=?,portal_pwd_status=0 " . $salt_clause . " WHERE pid=?", $query_parameters);
+        sqlStatementNoLog("UPDATE patient_access_onsite SET portal_username=?,portal_onetime=?,portal_pwd=?,portal_pwd_status=0 " . $salt_clause . " WHERE pid=?", $query_parameters);
     } else {
-        sqlStatement("INSERT INTO patient_access_onsite SET portal_username=?,portal_pwd=?,portal_pwd_status=0" . $salt_clause . " ,pid=?", $query_parameters);
+        sqlStatementNoLog("INSERT INTO patient_access_onsite SET portal_username=?,portal_onetime=?,portal_pwd=?,portal_pwd_status=0" . $salt_clause . " ,pid=?", $query_parameters);
     }
 
-    if (! (validEmail($newpd['email']))) {
-        $sent = false;
+    if (!validEmail($newpd['email_direct'])) {
+        if (validEmail($newpd['email'])) {
+            $newpd['email_direct'] = $newpd['email'];
+        }
     }
 
-    $message = messageCreate($uname, $clear_pass);
+    $message = messageCreate($uname, $pin, $encoded_link);
 
     $mail = new MyMailer();
-    $pt_name = $newpd['fname'] . ' ' . $newpd['lname'];
-    $pt_email = $newpd['email'];
-    $email_subject = xl('Access Your Patient Portal');
+    $pt_name = text($newpd['fname'] . ' ' . $newpd['lname']);
+    $pt_email = text($newpd['email_direct']);
+    $email_subject = xlt('Access Your Patient Portal');
     $email_sender = $GLOBALS['patient_reminder_sender_email'];
     $mail->AddReplyTo($email_sender, $email_sender);
     $mail->SetFrom($email_sender, $email_sender);
@@ -198,14 +223,31 @@ function doCredentials($pid)
     $mail->AltBody = $message;
 
     if ($mail->Send()) {
-        $sent = true;
+        $sent = 1;
     } else {
         $email_status = $mail->ErrorInfo;
-        error_log("EMAIL ERROR: " . errorLogEscape($email_status), 0);
-        $sent = false;
+        $errorMsg = "EMAIL ERROR: " . errorLogEscape($email_status) . '<br />';
+        if ($newpd['id']) {
+            $errorMsg .= xlt("Your account has been successfully created however, we were unable to send the account information.");
+            $errorMsg .= "<br />" . xlt("Please contact your providers office with the following account information") . ":<br />";
+            $errorMsg1 = xlt("Account Id") . ": " . $uname . " " . xlt("MRN Reference") . ": " . $pid;
+            $errorMsg .= $errorMsg1;
+            $errorMsg .= "<br /><br />" . xlt("The providers office has been notified. Thank you.") . "<br />";
+            // notify admin of failure.
+            $title = xlt("Failed Registration");
+            $admin_msg = "\n" . xlt("A new patients credentials could not be sent after portal registration.");
+            $admin_msg .= "\n" . $errorMsg1;
+            $admin_msg .= "\n" . xlt("Please follow up.");
+            // send note
+            addPnote($pid, $admin_msg, 1, 1, $title, $user['username'], '', 'New');
+        } else {
+            $errorMsg .= "<br />" . xlt("We were unable to create an account.") . "<br />";
+            $errorMsg .= xlt("Please try again or contact the providers office for further assistance.");
+        }
+        error_log("Portal Registration error: " . errorLogEscape($errorMsg), 0);
+
+        return $errorMsg;
     }
-    if ($sent) {
-        $sent = "User : " . $uname . " Password : " . $clear_pass;
-    }
+
     return $sent;
 }

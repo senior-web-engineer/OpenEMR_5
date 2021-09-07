@@ -34,9 +34,9 @@ function loadObjectiveList() {
         const id = objective.id;
 
         objectiveTab += `
-            <a class='list-group-item list-group-item-action' 
-                id='objective_${id}' 
-                href='#' 
+            <a class='list-group-item list-group-item-action'
+                id='objective_${id}'
+                href='#'
                 onclick='changeObjective(${id})'
             >
                 ${objective.Description}
@@ -91,20 +91,20 @@ function loadInterventionOptions(problemNumber, groupID, objectiveNumber, object
 
 
 function loadIntervention(id) {
-    
+
     if (selectedProblemId < 0) {
         return;
     }
 
     const params = {form_id : form_id, api: 'getinterventions', problem_id: selectedProblemId, ObjectiveID: id};
-    
+
     // $.post(loadPath, params, function(resData){
     $.ajax({
         url: loadPath,
         type: 'POST',
         data: params,
         success: function(resData){
-    
+
             const objectiveIndex = findObjectiveById(id, true);
             if(!arrObjective[objectiveIndex]) {
                 return;
@@ -113,7 +113,7 @@ function loadIntervention(id) {
             arrObjective[objectiveIndex].arrintervention = resData.data.list;
 
             let interventionContents = "";
-            
+
             selectedInterventionId = -1;
 
             if (arrObjective[objectiveIndex].arrintervention) {
@@ -125,7 +125,7 @@ function loadIntervention(id) {
                     interventionContents += '<button class="btn btn-primary btn-sm" onclick="editintervention(' + id + ',' + element.id + ')">Edit</button>';
                     interventionContents += '<button class="btn btn-danger btn-sm"  onclick="deleteintervention(' + id + ',' + element.id + ')">Delete</button>';
                     interventionContents += '</li>';
-                    
+
                     arrObjective[objectiveIndex].maxintervention = Math.max(arrObjective[objectiveIndex].maxintervention, (Number(element.InterventionNumber) + 1));
 
                 });
@@ -140,7 +140,7 @@ function loadIntervention(id) {
 }
 
 function saveIntervention() {
-    
+
     if ($('#modal-first-select').val() < 0) {
         alert("Please select intervention");
         return;
@@ -165,7 +165,7 @@ function saveIntervention() {
             InterventionNumber : arrObjective[objectiveId].maxintervention,
             Description : $("#modal-first-select option:selected").html(),
             IsCustom : 0,
-            IsDeleted : 0, 
+            IsDeleted : 0,
             IsEvidenceBased : 0,
             ObjectiveID : selectedInterventionObjectiveId,
             problem_id: selectedProblem.id
@@ -212,11 +212,11 @@ function editintervention(objectiveId, id) {
 
     $('#modal-title').html('Edit Intervention');
     initinterventionDialog();
-    
+
 }
 
 function deleteintervention(objectiveId, id) {
-    
+
     if (id < 0 || !confirm("Are you sure you want to delete this Intervention?")) {
         return;
     }
@@ -269,9 +269,9 @@ function initinterventionDialog() {
     $('#modal-second').hide();
 
     $('#modal-first-label').html(interventionHeading.selectors[0].heading);
-    
+
     $('#modal-first-select').empty().append("<option value='-1'>Please select intervention</option>");
-    
+
     arrObjective[objectiveIndex].arrinterventionOptions.forEach(function(element) {
         $('#modal-first-select').append("<option value='" + element.value + "'>" + element.desc + "</option>");
     });
@@ -281,7 +281,7 @@ function initinterventionDialog() {
         const selectedintervention = findInterventionById(selectedInterventionObjectiveId, selectedInterventionId);
 
         $("#modal-first-select option").filter(function() {
-        
+
             return $(this).text() == selectedintervention.Description;
 
           }).prop('selected', true);

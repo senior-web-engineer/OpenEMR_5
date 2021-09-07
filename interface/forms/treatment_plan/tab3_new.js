@@ -4,6 +4,7 @@ var currStep = 0;
 let bStepChange = true;
 
 $(function() {
+    console.log('tab3_new')
 	$('#mainSplitter').jqxSplitter({
 		width: 'calc(100% - 10px)',
 		height: 'calc(100% - 10px)',
@@ -13,14 +14,19 @@ $(function() {
 		],
 		theme: theme
 	});
+    $('#subSplitter').jqxSplitter({ width: '100%', height: '100%',
+        orientation: 'horizontal',
+        panels: [{ size:210, min: 100,  },
+        {size:120}]
+    });
 
-	$('#jqxExpander').jqxExpander({
-		width: '100%',
-		height: '100%',
-		showArrow: false,
-		toggleMode: 'none',
-		theme: theme
-	});
+	// $('#jqxExpander').jqxExpander({
+	// 	width: '100%',
+	// 	height: '100%',
+	// 	showArrow: false,
+	// 	toggleMode: 'none',
+	// 	theme: theme
+	// });
 
 	// Step show event
     $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
@@ -49,7 +55,7 @@ $(function() {
     });
 
     $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
-        
+
         if (stepDirection === "backward") {
             return true;
         }
@@ -59,7 +65,7 @@ $(function() {
             case 0:
                 if (!arrDiagnosis || arrDiagnosis.length < 1)
                     isValid = false;
-                break;    
+                break;
             case 1:
                 if (!arrBehavior || arrBehavior.length < 1)
                     isValid = false;
@@ -81,7 +87,7 @@ $(function() {
                     isValid = false;
                 break;
             case 6:
-                if (!arrModalityNote || arrModalityNote.length < 1) 
+                if (!arrModalityNote || arrModalityNote.length < 1)
                     isValid = false;
                 break;
             // case 5:
@@ -89,7 +95,7 @@ $(function() {
             //         isValid = false;
             //     break;
         }
-    
+
         return isValid;
     });
 
@@ -102,7 +108,7 @@ $(function() {
         bStepChange = true;
         loadStep();
     });
-    
+
 
     $("#prev-btn").on("click", function() {
         // Navigate previous
@@ -158,21 +164,23 @@ $(function() {
 function cleanSteps() {
 
     bStepChange = false;
-    $('#smartwizard').smartWizard("reset"); 
-    
+    $('#smartwizard').smartWizard("reset");
+
 }
 
 function loadStep() {
+    if(currStep > 5) return;
     //in the case of Objective/interventions and modality, not show any prev contents
     if ( currStep == 3 || currStep == 4 || currStep == 5 || currStep == 7 || currStep == 1) {
         return;
     }
     let i = 1;
-    for ( i = 1 ; i < 8 ; i ++ ) {
+    for ( i = 1 ; i < 6 ; i ++ ) {
+        // for ( i = 1 ; i < 8 ; i ++ ) {
         $('#step-' + i + ' .step-prev-contents').html('');
     }
     $('.step-content-header').hide();
-	
+
 
     if (currStep == 5) {
         $( '#step-4 .step-content-body').clone().appendTo( '#step-5 .step-prev-contents' );
@@ -195,6 +203,29 @@ function gotoStep(step) {
     let i = 0;
     for (i = 0 ; i < step ; i ++) {
         bStepChange = false;
+        setTimeout(()=>{
         $("#smartwizard").smartWizard("next");
+        },1000)
+        //  $("#smartwizard").smartWizard("next");
     }
+}
+
+// show modality & discharge
+function displayModality(){
+    document.getElementById('smartwizard').classList.add('hide');
+    document.getElementById('step-6').classList.remove('hide');
+    document.getElementById('step-7').classList.add('hide');
+    document.getElementById('step-8').classList.add('hide');
+}
+function displayModalityNote(){
+    document.getElementById('smartwizard').classList.add('hide');
+    document.getElementById('step-6').classList.add('hide');
+    document.getElementById('step-7').classList.remove('hide');
+    document.getElementById('step-8').classList.add('hide');
+}
+function displayDischarge(){
+    document.getElementById('smartwizard').classList.add('hide');
+    document.getElementById('step-6').classList.add('hide');
+    document.getElementById('step-7').classList.add('hide');
+    document.getElementById('step-8').classList.remove('hide');
 }

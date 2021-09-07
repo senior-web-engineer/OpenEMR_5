@@ -11,7 +11,7 @@
  * @author Ray Magauran magauran@medfetch.com
  * @copyright Copyright (c) 2010 OpenEMR Support LLC
  * @copyright Copyright (c) 2017 MedEXBank.com
- * @copyright Copyright (c) 2018 Brady Miller <brady.g.miller@gmail.com>
+ * @copyright Copyright (c) 2018-2019 Brady Miller <brady.g.miller@gmail.com>
  * @license https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
  */
 
@@ -44,7 +44,6 @@ $MedEx = new MedExApi\MedEx('MedExBank.com');
 
 if ($GLOBALS['medex_enable'] == '1') {
     if ($_REQUEST['SMS_bot']) {
-        $result = $MedEx->login('1');
         $MedEx->display->SMS_bot($result);
         exit();
     }
@@ -150,19 +149,14 @@ if (!empty($_REQUEST['go'])) { ?>
             $MedEx->setup->MedExBank($stage);
         }
     } elseif ($_REQUEST['go'] == "addRecall") {
-        echo "<title>" . xlt('New Recall') . "</title></head><body class='body_top'>";
         $MedEx->display->display_add_recall();
     } elseif ($_REQUEST['go'] == 'Recalls') {
-        echo "<title>" . xlt('Recall Board') . "</title></head><body class='body_top'>";
         $MedEx->display->display_recalls($logged_in);
     } elseif ((($_REQUEST['go'] == "setup") || ($_REQUEST['go'] == 'Preferences')) && ($logged_in)) {
-        echo "<title>MedEx" . xlt('Preferences') . "</title></head><body class='body_top'>";
         $MedEx->display->preferences();
     } elseif ($_REQUEST['go'] == 'icons') {
-        echo "<title>MedEx" . xlt('Icons') . "</title></head><body class='body_top'>";
         $MedEx->display->icon_template();
     } elseif ($_REQUEST['go'] == 'SMS_bot') {
-        echo "<title>MedEx" . xlt('SMS') . "</title></head><body class='body_top'>";
         $MedEx->display->SMS_bot($logged_in);
         exit;
     } else {
@@ -177,7 +171,7 @@ if (!empty($_REQUEST['go'])) { ?>
     } elseif ($GLOBALS['enable_help'] == 2) {
         $help_icon = '<a class="pull-right oe-help-redirect" data-target="#myModal" data-toggle="modal" href="#" id="help-href" name="help-href" style="color:#DCD6D0 !Important" title="' . xla("To enable help - Go to  Administration > Globals > Features > Enable Help Modal") . '"><i class="fa fa-question-circle" aria-hidden="true"></i></a>';
     } elseif ($GLOBALS['enable_help'] == 0) {
-         $help_icon = '';
+        $help_icon = '';
     }
     $heading_caption = xlt('Messages') . ', ' . xlt('Reminders');
     if ($GLOBALS['disable_rcb'] != '1') {
@@ -283,7 +277,7 @@ if (!empty($_REQUEST['go'])) { ?>
                         ?>
                         <div class="oe-margin-b-20">
                             <span class="title"><?php echo text($messages); ?></span>
-                            <a class='more' href=<?php echo $lnkvar; ?></a>
+                            <a class='more' href=<?php echo $lnkvar; ?>></a>
                         </div>
                         <div class="oe-margin-b-10">
                             <?php

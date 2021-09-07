@@ -10,13 +10,14 @@ function clearDischarge() {
 }
 
 function loadDischarge() {
-    
-    if (selectedProblemId < 0) {
-        return;
-    }
 
-    const params = {form_id : form_id, api: 'getdischargecriteria', problem_id: selectedProblemId};
-    
+    // if (selectedProblemId < 0) {
+    //     return;
+    // }
+
+    // const params = {form_id : form_id, api: 'getdischargecriteria', problem_id: selectedProblemId};
+    const params = {form_id : form_id, api: 'getdischargecriteria'};
+
     $.ajax({
         url: loadPath,
         type: 'POST',
@@ -24,7 +25,7 @@ function loadDischarge() {
         success: function(resData){
 
     // $.post(loadPath, params, function(resData){
-    
+
             arrDischarge = resData.data.list;
             let dischargeContents = "";
             selectedDischargeId = -1;
@@ -41,17 +42,17 @@ function loadDischarge() {
                     dischargeContents += '<button class="btn btn-danger btn-sm"  onclick="deleteDischarge(' + element.id + ')">Delete</button>';
                     dischargeContents += '</div></div>';
                     dischargeContents += '</li>';
-                    
+
                 });
 
             }
 
             $('#discharge-contents').html(dischargeContents);
             loadStep();
-            if (isChangingProblem) {
-                checkAllLoaded();
-            }
-    
+            // if (isChangingProblem) {
+            //     checkAllLoaded();
+            // }
+
         }
     });
 
@@ -68,8 +69,8 @@ function saveDischarge() {
         id : -1,
         form_id : form_id,
         Criteria : $("#discharge-criteria").val(),
-        IsDeleted : 0, 
-        problem_id: selectedProblemId
+        IsDeleted : 0,
+        // problem_id: selectedProblemId
 
     };
 
@@ -80,7 +81,7 @@ function saveDischarge() {
     $.post(savePath, params, function(){
         loadDischarge();
         $('#discharge-modal').modal('hide');
-        parent.$.fancybox.close();
+        // parent.$.fancybox.close();
     });
 }
 
@@ -102,14 +103,14 @@ function editDischarge(id) {
     }
 
     selectedDischargeId = id;
-    
+
     $('#discharge-title').html('Edit Discharge');
     initDischargeDialog();
-    
+
 }
 
 function deleteDischarge(id) {
-    
+
     if (id < 0 || !confirm("Are you sure you want to delete this Discharge?")) {
         return;
     }

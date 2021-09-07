@@ -12,14 +12,15 @@ function clearModalityNote() {
 
 
 function loadModalityNotes() {
-    
-    if (selectedProblemId < 0) {
-        return;
-    }
+
+    // if (selectedProblemId < 0) {
+    //     return;
+    // }
     clearModalityNote();
 
-    const params = {form_id : form_id, api: 'getmodalitynotes', problem_id: selectedProblemId};
-    
+    // const params = {form_id : form_id, api: 'getmodalitynotes', problem_id: selectedProblemId};
+    const params = {form_id : form_id, api: 'getmodalitynotes'};
+
     $.ajax({
         url: loadPath,
         type: 'POST',
@@ -27,7 +28,7 @@ function loadModalityNotes() {
         success: function(resData){
 
         // $.post(loadPath, params, function(resData){
-        
+
             arrModalityNote = resData.data.list;
 
             if (arrModalityNote) {
@@ -45,19 +46,19 @@ function loadModalityNotes() {
                     // modalityContents += '<button class="btn btn-danger btn-sm"  onclick="deleteModalityNote(' + element.id +')">Delete</button>';
                     // modalityContents += '</div></div>';
                     // modalityContents += '</li>';
-    
+
                 });
 
                 $('#btn-add-modality-note').html('Update');
                 $('#btn-delete-modality-note').prop('disabled', false);
-            
+
             }
 
             loadStep();
-            if (isChangingProblem) {
-                checkAllLoaded();
-            }
-    
+            // if (isChangingProblem) {
+            //     checkAllLoaded();
+            // }
+
         }
     })
 
@@ -65,10 +66,10 @@ function loadModalityNotes() {
 
 function saveModalityNote() {
 
-    if (selectedProblemId < 0) {
-        alert("No Problem selected");
-        return;
-    }
+    // if (selectedProblemId < 0) {
+    //     alert("No Problem selected");
+    //     return;
+    // }
 
     let newNotes = "";
     newNotes = $('#modality-notes').val();
@@ -78,15 +79,15 @@ function saveModalityNote() {
         return;
     }
 
-    const selectedProblem = findProblemById(selectedProblemId);
-    
+    // const selectedProblem = findProblemById(selectedProblemId);
+
     let params = {
         api : 'savemodalitynotes',
         id : modalityNoteId,
         form_id : form_id,
         Notes : newNotes,
-        IsDeleted : 0, 
-        problem_id: selectedProblemId
+        IsDeleted : 0,
+        // problem_id: selectedProblemId
     };
 
     $.post(savePath, params, function(resData){
@@ -95,15 +96,15 @@ function saveModalityNote() {
 }
 
 function deleteModalityNote() {
-    
-    const selectedProblem = findProblemById(selectedProblemId);   
+
+    // const selectedProblem = findProblemById(selectedProblemId);
     let params = {
         api : 'savemodalitynotes',
         id : modalityNoteId,
         form_id : form_id,
         Notes : '',
-        IsDeleted : 1, 
-        problem_id: selectedProblem.id
+        IsDeleted : 1,
+        // problem_id: selectedProblem.id
     };
 
     $.post(savePath, params, function(){

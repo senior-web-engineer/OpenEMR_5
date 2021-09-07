@@ -5,7 +5,7 @@
  * @package   OpenEMR
  * @link      https://www.open-emr.org
  * @author    Jerry Padgett <sjpadgett@gmail.com>
- * @copyright Copyright (c) 2016-2017 Jerry Padgett <sjpadgett@gmail.com>
+ * @copyright Copyright (c) 2016-2020 Jerry Padgett <sjpadgett@gmail.com>
  * @license   https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
  */
 
@@ -57,6 +57,11 @@ class PatientController extends AppBaseController
             $pid = ( int ) $_GET['pid'];
         }
 
+        // only allow patient to see themself
+        if (!empty($GLOBALS['bootstrap_pid'])) {
+            $pid = $GLOBALS['bootstrap_pid'];
+        }
+
         if (isset($_GET['user'])) {
             $user = $_GET['user'];
         }
@@ -68,19 +73,39 @@ class PatientController extends AppBaseController
         if (isset($_GET['register'])) {
             $register = $_GET['register'];
         }
-
         $this->Assign('recid', $rid);
         $this->Assign('cpid', $pid);
         $this->Assign('cuser', $user);
         $this->Assign('encounter', $encounter);
         $this->Assign('register', $register);
+
         $trow = array();
         $ptdata = $this->startupQuery($pid);
         foreach ($ptdata[0] as $key => $v) {
             $trow[lcfirst($key)] = $v;
         }
-
         $this->Assign('trow', $trow);
+
+        // seek and qualify excluded edits
+        $exclude = [];
+        $q = sqlStatement("SELECT `field_id`, `uor`, `edit_options` FROM `layout_options` " .
+            "WHERE `form_id` = 'DEM' AND (`uor` = 0 || `edit_options` > '')" .
+            "ORDER BY `group_id`, `seq`");
+        while ($key = sqlFetchArray($q)) {
+            if ((int)$key['uor'] === 0 || strpos($key['edit_options'], "EP") !== false) {
+                $key['field_id'] = strtolower($key['field_id']);
+                $key['field_id'] = preg_replace_callback(
+                    '/_([^_])/',
+                    function (array $m) {
+                        return ucfirst($m[1]);
+                    },
+                    $key['field_id']
+                );
+                $exclude[] = lcfirst($key['field_id']) . "InputContainer";
+            }
+        }
+        $this->Assign('exclude', $exclude);
+
         $this->Render();
     }
     /**
@@ -111,6 +136,12 @@ class PatientController extends AppBaseController
         try {
             $criteria = new PatientCriteria();
             $pid = RequestUtil::Get('patientId');
+
+            // only allow patient to see themself
+            if (!empty($GLOBALS['bootstrap_pid'])) {
+                $pid = $GLOBALS['bootstrap_pid'];
+            }
+
             $criteria->Pid_Equals = $pid;
 
             $output = new stdClass();
@@ -375,9 +406,13 @@ class PatientController extends AppBaseController
             $audit['action_taken_time'] = date("Y-m-d H:i:s");
             $audit['checksum'] = "0";
 
+            // returns false for new audit
             $edata = $appsql->getPortalAudit($ja['pid'], 'review');
-            $audit['date'] = $edata['date'];
-            if ($edata['id'] > 0) {
+            if ($edata) {
+                if (empty($edata['id'])) {
+                    throw new Exception("Invalid ID on Save!");
+                }
+                $audit['date'] = $edata['date'] ?? null;
                 $appsql->portalAudit('update', $edata['id'], $audit);
             }
         } catch (Exception $ex) {

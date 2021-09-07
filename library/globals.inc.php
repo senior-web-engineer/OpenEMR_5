@@ -2820,6 +2820,20 @@ $GLOBALS_METADATA = array(
             xl('Allow insurance eligibility checks using Office Ally')
         ),
 
+        'cc_front_payments' => array(
+            xl('Accept Credit Card transactions from Front Payments'),
+            'bool',                           // data type
+            '0',
+            xl('Allow manual entry and authorise credit card payments. Ensure a gateway is enabled.')
+        ),
+
+        'cc_inperson_payments' => array(
+            xl('Accept Credit Cards In Person POS'),
+            'bool',                           // data type
+            '0',
+            xl('Enable POS payment terminal support. Currently P-400')
+        ),
+
         'payment_gateway' => array(
             xl('Select Credit Card Payment Gateway'),
             array(
@@ -3599,65 +3613,7 @@ $GLOBALS_METADATA = array(
         ),
 
     ),
- // Report Tab
-    // Custom Form Features
-    'Custom Forms' => array(
-
-
-
-
-
-
-        'signature_pab' => array(
-            xl('Use Electronic Signature Pad'),
-            array(
-                '0' => xl('None'),
-                '1' => xl('Topaz'),
-                '2' => xl('Web'),
-         
-            ),                       // data type
-            '0',                     // default = Print End of Day Report 1
-            xl('Describe Here.')
-        ),
-        'auto_save_timer' => array(
-            xl('Auto-save Interval '),
-            array(
-                '.10' => xl('10 Seconds (DEBUG Only)'),
-                '5' => xl('5 Minutes'),
-                '10' => xl('10 Minutes'),
-
-            ),
-            '1',                              // default
-            xl('Describe Here')
-        ),
-		
-		'form_lock' => array(
-            xl('Activate Form Lock'),
-            array(
-                '0' => xl('No'),
-                '1' => xl('Yes'),
-            ),
-            '1',                              // default
-            xl('Describe Here')
-        ),
-
-
-        'form_lock_override' => array(
-            xl('Override Lock on Forms Option'),
-            array(
-                '0' => xl('No'),
-                '1' => xl('Yes'),
-            ),
-            '1',                              // default
-            xl('Describe Here')
-        ),
-
-
-    ),
-
-   
 );
-
 
 if (!$skipGlobalEvent) {
     $globalsInitEvent = new GlobalsInitializedEvent(new GlobalsService($GLOBALS_METADATA, $USER_SPECIFIC_GLOBALS, $USER_SPECIFIC_TABS));

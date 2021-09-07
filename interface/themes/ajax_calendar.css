@@ -16,9 +16,25 @@ div.tiny { width:1px; height:1px; font-size:1px; }
 #printview, #dayview, #weekview, #monthview {
     cursor: pointer; cursor: hand;
 }
+
+.calsearch_body {
+    padding: 0px 0px;
+}
+.sidebar-wrapper {
+    margin-left: -30rem;
+    -webkit-transition: margin .25s ease-out;
+    -moz-transition: margin .25s ease-out;
+    -o-transition: margin .25s ease-out;
+    transition: margin .25s ease-out;
+}
+.page-content-wrapper {
+    width: 100%;
+}
+#wrapper.toggled .sidebar-wrapper {
+    margin-left: 0;
+}
 #functions {
-    width: 13.5%; /* can't make this 25% for some reason */
-    min-width: 105px;
+    min-width: 20%;
     float: left;
     padding: 0px 5px 0px 5px;
     margin-right: 0%; /* added because of the width issue above */
@@ -26,7 +42,6 @@ div.tiny { width:1px; height:1px; font-size:1px; }
 .rtl #functions{
     float: right;
 }
-
 #topToolbarRight {
     float: right;
     width: 100%;
@@ -414,4 +429,21 @@ div.tiny { width:1px; height:1px; font-size:1px; }
 .pop-up img {
     width: 150px;
     margin: 10px;
+}
+@media (max-width: 768px) {
+    #prevday, #nextday, #prevweek, #nextweek, #prevmonth, #nextmonth {
+        font-size: 1.3em;
+    }
+}
+@media (min-width: 768px) {
+    .sidebar-wrapper {
+        margin-left: 0;
+    }
+    .page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+    #wrapper.toggled .sidebar-wrapper {
+        margin-left: -30rem;
+    }
 }

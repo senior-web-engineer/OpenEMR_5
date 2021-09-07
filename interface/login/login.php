@@ -151,13 +151,22 @@ if (count($emr_app)) {
             $("#authUser").focus();
         }
 
-        function transmit_form() {
+        function transmit_form(element) {
+            // disable submit button to insert a notification of working
+            element.disabled = true;
+            // nothing fancy. mainly for mobile.
+            element.innerHTML = '<i class="fa fa-refresh fa-spin"></i> <?php echo xlt("Authenticating"); ?>';
             <?php if (!empty($GLOBALS['restore_sessions'])) { ?>
                 // Delete the session cookie by setting its expiration date in the past.
                 // This forces the server to create a new session ID.
                 var olddate = new Date();
                 olddate.setFullYear(olddate.getFullYear() - 1);
-                document.cookie = <?php echo json_encode(urlencode(session_name())); ?> + '=' + <?php echo json_encode(urlencode(session_id())); ?> + '; path=<?php echo($web_root ? $web_root : '/');?>; expires=' + olddate.toGMTString();
+                <?php if (version_compare(phpversion(), '7.3.0', '>=')) { ?>
+                    // Using the SameSite setting when using php version 7.3.0 or above, which avoids browser warnings when cookie is not 'secure' and SameSite is not set to anything
+                    document.cookie = <?php echo json_encode(urlencode(session_name())); ?> + '=' + <?php echo json_encode(urlencode(session_id())); ?> + '; path=<?php echo($web_root ? $web_root : '/');?>; expires=' + olddate.toGMTString() + '; SameSite=Strict';
+                <?php } else { ?>
+                    document.cookie = <?php echo json_encode(urlencode(session_name())); ?> + '=' + <?php echo json_encode(urlencode(session_id())); ?> + '; path=<?php echo($web_root ? $web_root : '/');?>; expires=' + olddate.toGMTString();
+                <?php } ?>
             <?php } ?>
             document.forms[0].submit();
         }
@@ -374,9 +383,11 @@ if (count($emr_app)) {
                         </div>
                     <?php endif; // End facilities menu block ?>
                     <div class="form-group pull-right">
-                        <button type="submit" class="btn btn-default btn-lg" onClick="transmit_form()"><i class="fa fa-sign-in"></i>&nbsp;&nbsp;<?php echo xlt('Login'); ?></button>
+                        <button type="submit" class="btn btn-default btn-lg" onClick="transmit_form(this)"><i class="fa fa-sign-in"></i>&nbsp;&nbsp;<?php echo xlt('Login');?></button>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-sm-12 text-center">
                     <p class="small">
                         <a href="../../acknowledge_license_cert.html" target="main"><?php echo xlt('Acknowledgments, Licensing and Certification'); ?></a>

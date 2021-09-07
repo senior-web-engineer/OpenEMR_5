@@ -9,8 +9,10 @@
  * @author    (Mac) Kevin McAloon <mcaloon@patienthealthcareanalytics.com>
  * @author    Brady Miller <brady.g.miller@gmail.com>
  * @author    Roberto Vasquez <robertogagliotta@gmail.com>
+ * @author    Stephen Waite <stephen.waite@cmsvt.com>
  * @copyright Copyright (c) 2011 Phyaura, LLC <info@phyaura.com>
  * @copyright Copyright (c) 2019 Brady Miller <brady.g.miller@gmail.com>
+ * @copyright Copyright (c) 2019 Stephen Waite <stephen.waite@cmsvt.com>
  * @license   https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
  */
 
@@ -45,14 +47,11 @@ function temp_unarchive($filename, $type)
         return false;
     } else {
     // let's unzip the file
-    // use checksums to determine the "version"
-    //
-        $zip = new ZipArchive;
-        if ($zip->open($filename, ZipArchive::CREATE) === true) {
-            if (!($zip->extractTo($GLOBALS['temporary_files_dir']."/".$type))) {
+        $zip = new ZipArchive();
+        if ($zip->open($filename) === true) {
+            if (!($zip->extractTo($GLOBALS['temporary_files_dir'] . "/" . $type))) {
                 return false;
             }
-
             $zip->close();
             return true;
         } else {
@@ -427,10 +426,13 @@ function snomedRF2_import()
 //
 function icd_import($type)
 {
-
     // set up paths
-    $dir_icd = $GLOBALS['temporary_files_dir']."/".$type."/";
-    $dir=str_replace('\\', '/', $dir_icd);
+    $dir_icd = $GLOBALS['temporary_files_dir'] . "/" . $type . "/";
+    $dir = str_replace('\\', '/', $dir_icd);
+    // since CMS nested the ICD10 codes...
+    if ($type == 'ICD10') {
+        $dir = $dir . "/2020 Code Descriptions/";
+    }
     $db_load = '';
     $db_update = '';
 
@@ -679,7 +681,6 @@ function handle_zip_file($mode, $file)
         temp_dir_cleanup($mode);
         exit;
     }
-
         // 2. unarchive the file
     if (!temp_unarchive($file, $mode)) {
         echo htmlspecialchars(xl('ERROR: Unable to extract the file.'), ENT_NOQUOTES)."<br>";

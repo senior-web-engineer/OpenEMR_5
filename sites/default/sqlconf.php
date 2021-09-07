@@ -4,8 +4,8 @@
 
 $host	= 'localhost';
 $port	= '3306';
-$login	= 'root';
-$pass	= 'root';
+$login	= 'openemr';
+$pass	= 'openemr';
 $dbase	= 'openemr';
 
 //Added ability to disable

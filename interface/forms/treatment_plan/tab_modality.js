@@ -8,19 +8,20 @@ function clearModality() {
     selectedModalityId = -1;
     arrModalityOptions = [];
     arrModality = [];
-    $('#btn-add-modality').prop('disabled', true);
+    // $('#btn-add-modality').prop('disabled', true);
 
 }
 
 function loadModality() {
-    
-    if (selectedProblemId < 0) {
-        return;
-    }
-    $('#btn-add-modality').prop('disabled', false);
 
-    const params = {form_id : form_id, api: 'getmodalities', problem_id: selectedProblemId};
-    
+    // if (selectedProblemId < 0) {
+    //     return;
+    // }
+    // $('#btn-add-modality').prop('disabled', false);
+
+    // const params = {form_id : form_id, api: 'getmodalities', problem_id: selectedProblemId};
+    const params = {form_id : form_id, api: 'getmodalities'};
+
     $.ajax({
         url: loadPath,
         type: 'POST',
@@ -28,7 +29,7 @@ function loadModality() {
         success: function(resData){
 
         // $.post(loadPath, params, function(resData){
-        
+
             arrModality = resData.data.list;
             let modalityContents = "";
             selectedModalityId = -1;
@@ -86,32 +87,32 @@ function loadModality() {
 
             $('#modality-contents').html(modalityContents);
             loadStep();
-            if (isChangingProblem) {
-                checkAllLoaded();
-            }
-    
+            // if (isChangingProblem) {
+            //     checkAllLoaded();
+            // }
+
         }
     })
 
 }
 
 function saveModality() {
-    
-    if (!$("#modalityStartDate").val()         || !$("#modalityEndDate").val() || 
-        !$("#modality-service-select").val()   || !$("#modality-duration-hour-select").val() || 
-        !$("#modality-interval-select").val()  || !$("#modality-duration-min-select").val() || 
+
+    if (!$("#modalityStartDate").val()         || !$("#modalityEndDate").val() ||
+        !$("#modality-service-select").val()   || !$("#modality-duration-hour-select").val() ||
+        !$("#modality-interval-select").val()  || !$("#modality-duration-min-select").val() ||
         !$("#modality-frequency-select").val() || !$("#modalityProvider").val()) {
-        
+
         alert("Please insert all values");
         return;
 
     }
 
-    if (selectedProblemId < 0) {
-        return;
-    }
-    const selectedProblem = findProblemById(selectedProblemId);
-    
+    // if (selectedProblemId < 0) {
+    //     return;
+    // }
+    // const selectedProblem = findProblemById(selectedProblemId);
+
     let params = {
         api : 'savemodalities',
         id : -1,
@@ -125,10 +126,10 @@ function saveModality() {
         duration_minute : $("#modality-duration-min-select option:selected").html(),
         provider : $('#modalityProvider').val(),
         IsDeleted: 0,
-        problem_id: selectedProblemId
+        // problem_id: selectedProblemId
 
     };
-    
+
     if (selectedModalityId > -1 ) {
         params.id = selectedModalityId;
     }
@@ -146,7 +147,7 @@ function createNewModality() {
     selectedModalityId = -1;
 
     if (!arrModalityOptions) {
-        
+
         alert('There is no option');
         return;
 
@@ -165,14 +166,14 @@ function editModality(id) {
     }
 
     selectedModalityId = id;
-    
+
     $('#modality-title').html('Edit Modality');
     initModalityDialog();
-    
+
 }
 
 function deleteModality(id) {
-    
+
     if (id < 0 || !confirm("Are you sure you want to delete this Modality?")) {
         return;
     }
@@ -218,33 +219,33 @@ function initModalityDialog() {
         $('#modalityStartDate').val(selectedModality.start_date);
         $('#modalityEndDate').val(selectedModality.end_date);
         $('#modalityProvider').val(selectedModality.provider);
-        
+
         $("#modality-service-select option").filter(function() {
-        
+
             return $(this).text() == selectedModality.modality;
 
         }).prop('selected', true);
         $("#modality-interval-select option").filter(function() {
-        
+
             return $(this).text() == selectedModality.intervals;
 
         }).prop('selected', true);
         $("#modality-frequency-select option").filter(function() {
-        
+
             return $(this).text() == selectedModality.frequency;
 
         }).prop('selected', true);
         $("#modality-duration-hour-select option").filter(function() {
-        
+
             return $(this).text() == selectedModality.duration_hour;
 
         }).prop('selected', true);
         $("#modality-duration-min-select option").filter(function() {
-        
+
             return $(this).text() == selectedModality.duration_minute;
 
         }).prop('selected', true);
-         
+
     }
 
 }

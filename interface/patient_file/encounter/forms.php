@@ -91,6 +91,12 @@ if (!empty($_GET['attachid'])) {
 <script type="text/javascript">
 $.noConflict();
 jQuery(document).ready( function($) {
+    <?php if ((boolean) $GLOBALS['expand_form']) { ?>
+    expandcollapse("expand");
+    <?php } else { ?>
+    expandcollapse("collapse");
+    <?php } ?>
+
     var formConfig = <?php echo $esignApi->formConfigToJson(); ?>;
     $(".esign-button-form").esign(
         formConfig,
@@ -545,7 +551,7 @@ $old_category = '';
 $encounterLocked = false;
 if ($esignApi->lockEncounters() &&
 isset($GLOBALS['encounter']) &&
-!empty($GLOBALS['encounter']) ) {
+!empty($GLOBALS['encounter'])) {
     $esign = $esignApi->createEncounterESign($GLOBALS['encounter']);
     if ($esign->isLocked()) {
         $encounterLocked = true;
@@ -1026,14 +1032,7 @@ if ($pass_sens_squad &&
             }
         }
 
-//Added by dnunez 12/12/16
-		echo "<a target='".
-                ($GLOBALS['concurrent_layout'] ? : "Main") .
-                "' href='$rootdir/patient_file/encounter/print_form.php?" .
-                "formname=" . $formdir . "&id=" . $iter['form_id'] .
-                "' onclick='top.restoreSession()' class='css_button_small'><span>" . xl('Print/View') . "</span></a>";
-        //End addition        
-		if (($esign->isButtonViewable() and $is_group == 0 and $authPostCalendarCategoryWrite) or ($esign->isButtonViewable() and $is_group and acl_check("groups", "glog", false, 'write') and $authPostCalendarCategoryWrite)) {
+        if (($esign->isButtonViewable() and $is_group == 0 and $authPostCalendarCategoryWrite) or ($esign->isButtonViewable() and $is_group and acl_check("groups", "glog", false, 'write') and $authPostCalendarCategoryWrite)) {
             if (!$aco_spec || acl_check($aco_spec[0], $aco_spec[1], '', 'write')) {
                 echo $esign->buttonHtml();
             }

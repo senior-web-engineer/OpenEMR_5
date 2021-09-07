@@ -6,7 +6,7 @@ let arrDiagnosis = [];
 function loadDiagnosisHeading() {
 
     const params = { api: 'getControl', page: 'treatment_plan/edit.php', textboxid: 'diagnosis_Description' };
-    
+
     $.ajax({
         url: selectorPath,
         type: 'POST',
@@ -70,6 +70,7 @@ function loadDiagnosisOptions(problemNumber, groupID) {
 
 
 function loadDiagnosis() {
+    document.getElementById('btn-add-diagnosis').disabled = false;
 
     if (selectedProblemId < 0) {
         return;
@@ -88,6 +89,8 @@ function loadDiagnosis() {
             selectedDiagnosisId = -1;
 
             if (arrDiagnosis) {
+                // diagnosis limit to 1
+                document.getElementById('btn-add-diagnosis').disabled = true;
 
                 arrDiagnosis.forEach(function (element) {
 
@@ -112,7 +115,7 @@ function loadDiagnosis() {
             //                });
             //
             //           }
-            //YVES 07-11-2020 ^^^^^^^			
+            //YVES 07-11-2020 ^^^^^^^
             loadStep();
             if (isChangingProblem) {
                 checkAllLoaded();

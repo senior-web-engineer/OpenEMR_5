@@ -6,7 +6,7 @@ $(function () {
     var GroupID = 0;
     var ProblemNumber = 0;
     var ObjectiveNumber = 0;
-    
+
     //load form
     var loadProblemSelector = function () {
         var options = "<option value='-1'>Please choose...</option>";
@@ -16,8 +16,8 @@ $(function () {
             });
         };
         $("#availableProblems").html(options);
-        
-        var probs = ""; 
+
+        var probs = "";
         if (!_.isUndefined(oProblems)) {
             _.each(oProblems, function (item) {
                 probs += "<li class='active'><a data-toggle='tab' problemId='" + item.id + "'>";
@@ -30,10 +30,10 @@ $(function () {
             var problemId = $(this).attr("problemId");
             problemChange(problemId);
         });
-                
+
         tp_problem_number = 0;
     };
-    
+
     $(".sortable").sortable({
         handle: '.handle',
         stop: function(event, ui) {
@@ -44,7 +44,7 @@ $(function () {
                 problem.IsPrimary = i + 1;
                 if (i === 0){
                     problemChange(problemId);
-                } 
+                }
                 _.extend(_.findWhere(oProblems, {id: problemId}), problem); //replace problem
                 $(el).html(getProblemListName(problem));
             });
@@ -52,11 +52,11 @@ $(function () {
         }
     });
     $(".sortable").disableSelection();
-    
+
     var setProblemPrimary = function(problemId, IsPrimary){
         postProblemPrimary(problemId, IsPrimary, function(){
             //done
-        });        
+        });
     }
 
     var getProblemListName = function(item){
@@ -75,12 +75,13 @@ $(function () {
             desc = "Primary Problem:";
         } else {
             desc = "Secondary Prob. :";
-        }        
+        }
         return desc;
     }
 
     var loadList = function (listID, editorType, objectList, filterObject, afterComplete) {
         var list = "";
+        console.log(objectList, '#####')
         $("#" + listID).html(list);
         if (!_.isUndefined(objectList)) {
             var oList = [];
@@ -103,19 +104,19 @@ $(function () {
                     	break;
                     	case "goal_item":
 
-                    	
+
                     	break;
                     	case "modality_item"://NOW
                     	break;
                     	case "modalitynote_item":
                             list += "<br>&nbsp;<span>" + item.Notes + "</span>"
 	                   	break;
-	                   	
+
 	                   	case "dischargecriteria_item":
 							list += "<br>&nbsp;<span>" + item.Criteria + "</span>"
 	                   	break;
 
-	                   	
+
 	                   	case "diagnosis_item":
 
 	                   	break;
@@ -135,14 +136,14 @@ $(function () {
                     	case "problem_item":
                     		//nothing happens
                     	break;
-                    	
+
                     	case "goal_item":
                     		list += "<br>";
                     		list += "&nbsp;<b>Status: </b><span>" + item.goal_status + "</span>";
                     	    list += "&nbsp;<b>Goal Action: </b><span>" + item.goal_action + "</span>";
                     	    list += "<br>";
                     	    list += "&nbsp;<b>Status Description: </b><span>" + item.review_status + "</span>";
-                    	    
+
 	                   	break;
 
                     	case "modality_item":
@@ -281,14 +282,14 @@ $(function () {
             //       //no tiVM
            //   }
 
-            
+
             case "modality_item":
                 var obj = _.findWhere(oModalities, { id: id });
                 if (_.isUndefined(obj)) { obj = _.findWhere(oModalities, { id: id + "" }); }
                 if (!_.isUndefined(obj)) {
                      fillModalities(obj);
                  }
-				break;          
+				break;
             case "modalitynote_item":
                 var obj = _.findWhere(oModalityNotes, { id: id });
                 if (_.isUndefined(obj)) { obj = _.findWhere(oModalityNotes, { id: id + "" }); }
@@ -329,7 +330,7 @@ $(function () {
                 if (_.isUndefined(obj)) { obj = _.findWhere(oDiagnosis, { id: id + "" }); }
                 if (!_.isUndefined(obj)) {
                     if (parseInt(obj.GroupID) <= 0) { obj.GroupID = obj.GroupID; }// Changed obj.GroupID = GroupID To obj.GroupID = '400' for testing
-/*Yves*/			if (parseInt(obj.ProblemNumber) <= 0) { obj.ProblemNumber = ProblemNumber; }																			
+/*Yves*/			if (parseInt(obj.ProblemNumber) <= 0) { obj.ProblemNumber = ProblemNumber; }
                     fillDiagnosis(obj);
 		    //  disableTextBox("diagnosis_Description",obj.DiagnosisNumber);
                     var tiVM = ko.contextFor($("#diagnosis_Description").get(0)).$data;
@@ -344,9 +345,9 @@ $(function () {
                     });
                 }
                 break;
-				
-				
-				
+
+
+
             case "diagnosis2_item":
                 var obj = _.findWhere(oDiagnosis2, { id: id });
                 if (_.isUndefined(obj)) { obj = _.findWhere(oDiagnosis2, { id: id + "" }); }
@@ -362,7 +363,7 @@ $(function () {
                         appendvalue: false,
                         params: { id1: form_id }
                     });
-                }          
+                }
                 break;
             case "diagnosis3_item":
                 var obj = _.findWhere(oDiagnosis3, { id: id });
@@ -386,7 +387,7 @@ $(function () {
                         appendvalue: false,
                         params: { id1: form_id }
                     });
-                }          
+                }
                 break;
             case "diagnosis5_item":
                 var obj = _.findWhere(oDiagnosis5, { id: id });
@@ -394,7 +395,7 @@ $(function () {
                 if (!_.isUndefined(obj)) {
                     fillDiagnosis5(obj);
                 }
-				break;                            
+				break;
             default:
                 alert("id= " + id + " type=" + editorType);
                 break;
@@ -603,20 +604,20 @@ $(function () {
         var selectbutton = $('#' + textareaid).closest(".section").find(".opentibutton");
         $(selectbutton).disable(false);
         $('#' + textareaid).disable(false);
-        if (selectedid <= 0){ // if not using librry 
+        if (selectedid <= 0){ // if not using librry
             if ($('#' + textareaid).val().length>0){
                 $(selectbutton).disable(true);
             }
         } else {
             $('#' + textareaid).disable(true);
-        }        
+        }
     };
 
     //Problems
     $("#availableProblems").on('change', function () {
         problemChange(this.value);
     });
-    
+
     var problemChange = function(problemid) {
         closeEditors(); //clear
         clearLists(); //clear all lists
@@ -677,7 +678,7 @@ $(function () {
         var maxProblemNumber = $("#availableProblems").children().length;
         if ($("#problems_menu li").length >= 4){
             alert("You have reached the maximum number of Problems allowed per Treatment Plan.");
-            return;   
+            return;
         }
         oProblems.push({ id: -1, tp_problem_number: maxProblemNumber, IsPrimary: maxProblemNumber });
         $("#tp_problem_number").val(maxProblemNumber);
@@ -699,7 +700,7 @@ $(function () {
             clearLists();
             var probParams = { form_id: $('#form_id').val(), api: "getproblems" };
             getCollection(probParams, "oProblems", loadProblemSelector);
-            alert("Reloading Treatment Plan Problems.  Please select a Problem on left column to continue"); 
+            alert("Reloading Treatment Plan Problems.  Please select a Problem on left column to continue");
         });
     });
 
@@ -732,9 +733,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oBDs.splice(objIdx,1);
-                } else { 
+                } else {
                     oBDs[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("bd_list", "bd_item", oBDs, { tp_problem_number: tp_problem_number });
@@ -746,7 +747,7 @@ $(function () {
         if (problemCheck()) {
             //create & reload or set everything to blank ID's
             var obj = { id: -1, tp_problem_number: tp_problem_number,
-                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+                GroupID: GroupID, ProblemNumber: ProblemNumber,
                 problem_id: problem_id
             };
             oGoals.push(obj);
@@ -771,9 +772,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oGoals.splice(objIdx,1);
-                } else { 
+                } else {
                     oGoals[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("goals_list", "goal_item", oGoals, { tp_problem_number: tp_problem_number });
@@ -785,7 +786,7 @@ $(function () {
         if (problemCheck()) {
             //create & reload or set everything to blank ID's
             var obj = { id: -1, tp_problem_number: tp_problem_number,
-                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+                GroupID: GroupID, ProblemNumber: ProblemNumber,
                 problem_id: problem_id
             };
             oObjectives.push(obj);
@@ -812,9 +813,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oObjectives.splice(objIdx,1);
-                } else { 
+                } else {
                     oObjectives[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //errors("updated objectives => " + JSON.stringify(oObjectives) + "<br/><br/>");
             //update list
@@ -827,7 +828,7 @@ $(function () {
         if (problemCheck()) {
             //create & reload or set everything to blank ID's
             var obj = { id: -1, tp_problem_number: tp_problem_number,
-                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+                GroupID: GroupID, ProblemNumber: ProblemNumber,
                 problem_id: problem_id
             };
             oInterventions.push(obj);
@@ -852,9 +853,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oInterventions.splice(objIdx,1);
-                } else { 
+                } else {
                     oInterventions[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("interventions_list", "intervention_item", oInterventions, { tp_problem_number: tp_problem_number });
@@ -866,7 +867,7 @@ $(function () {
 //        //if (problemCheck()) {
 //            //create & reload or set everything to blank ID's
 //            var obj = { id: -1, tp_problem_number: tp_problem_number,
-//                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+//                GroupID: GroupID, ProblemNumber: ProblemNumber,
 //                problem_id: problem_id
 //            };
 //            oModalities.push(obj);
@@ -891,9 +892,9 @@ $(function () {
 //            if (objIdx >= 0){
 //                if (action === "delete"){
 //                    oModalities.splice(objIdx,1);
-//                } else { 
+//                } else {
 //                   oModalities[objIdx] = obj; //replace the node
-//                } 
+//                }
 //            }
 //            //update list
 //            loadList("modalities_list", "modality_item", oModalities, { tp_problem_number: tp_problem_number });
@@ -927,9 +928,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oModalities.splice(objIdx,1);
-                } else { 
+                } else {
                     oModalities[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("modalities_list", "modality_item", oModalities);
@@ -961,9 +962,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oModalityNotes.splice(objIdx,1);
-                } else { 
+                } else {
                     oModalityNotes[objIdx] = obj; //replace the node
-                } 
+                }
             }
             hideAddButton("addModalityNote",oModalityNotes);
             //update list
@@ -996,9 +997,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oDischargeCriteria.splice(objIdx,1);
-                } else { 
+                } else {
                     oDischargeCriteria[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //hideAddButton("addDischargeCriteria",oDischargeCriteria);
             //update list
@@ -1030,9 +1031,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oStrength.splice(objIdx,1);
-                } else { 
+                } else {
                     oStrength[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("strength_list", "strength_item", oStrength);
@@ -1063,15 +1064,15 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oWeakness.splice(objIdx,1);
-                } else { 
+                } else {
                     oWeakness[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("weakness_list", "weakness_item", oWeakness);
         });
     });
-    
+
 	//Summary
     $("#addSummary").click(function () {
         //create & reload or set everything to blank ID's
@@ -1097,9 +1098,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oSummary.splice(objIdx,1);
-                } else { 
+                } else {
                     oSummary[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //hideAddButton("addSummary",oSummary);
 
@@ -1112,7 +1113,7 @@ $(function () {
     $("#addDiagnosis").click(function () {
         //create & reload or set everything to blank ID's
         var obj = { id: -1, tp_problem_number: tp_problem_number,
-                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+                GroupID: GroupID, ProblemNumber: ProblemNumber,
                 problem_id: problem_id
 				};
         oDiagnosis.push(obj);
@@ -1123,7 +1124,7 @@ $(function () {
         if (problemCheck()) {
             //create & reload or set everything to blank ID's
             var obj = { id: -1, tp_problem_number: tp_problem_number,
-                GroupID: GroupID, ProblemNumber: ProblemNumber, 
+                GroupID: GroupID, ProblemNumber: ProblemNumber,
                 problem_id: problem_id
             };
             oGoals.push(obj);
@@ -1149,9 +1150,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oDiagnosis.splice(objIdx,1);
-                } else { 
+                } else {
                     oDiagnosis[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("diagnosis_list", "diagnosis_item", oDiagnosis, { tp_problem_number: tp_problem_number });
@@ -1178,9 +1179,9 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oObjectives.splice(objIdx,1);
-                } else { 
+                } else {
                     oObjectives[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //errors("updated objectives => " + JSON.stringify(oObjectives) + "<br/><br/>");
             //update list
@@ -1213,14 +1214,14 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oDiagnosis2.splice(objIdx,1);
-                } else { 
+                } else {
                     oDiagnosis2[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("diagnosis_2list", "diagnosis2_item", oDiagnosis2);
         });
-    });    
+    });
 
     //Diagnosis2
     $("#addDiagnosis2").click(function () {
@@ -1247,15 +1248,15 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oDiagnosis2.splice(objIdx,1);
-                } else { 
+                } else {
                     oDiagnosis2[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("diagnosis2_list", "diagnosis2_item", oDiagnosis2);
         });
     });
-    
+
     //Diagnosis3
     $("#addDiagnosis3").click(function () {
         //create & reload or set everything to blank ID's
@@ -1281,15 +1282,15 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oDiagnosis3.splice(objIdx,1);
-                } else { 
+                } else {
                     oDiagnosis3[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("diagnosis3_list", "diagnosis3_item", oDiagnosis3);
         });
     });
-    
+
     //Diagnosis4
     $("#addDiagnosis4").click(function () {
         //create & reload or set everything to blank ID's
@@ -1315,15 +1316,15 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oDiagnosis4.splice(objIdx,1);
-                } else { 
+                } else {
                     oDiagnosis4[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("diagnosis4_list", "diagnosis4_item", oDiagnosis4);
         });
     });
-    
+
     //Diagnosis5
     $("#addDiagnosis5").click(function () {
         //create & reload or set everything to blank ID's
@@ -1349,14 +1350,14 @@ $(function () {
             if (objIdx >= 0){
                 if (action === "delete"){
                     oDiagnosis5.splice(objIdx,1);
-                } else { 
+                } else {
                     oDiagnosis5[objIdx] = obj; //replace the node
-                } 
+                }
             }
             //update list
             loadList("diagnosis5_list", "diagnosis5_item", oDiagnosis5);
         });
-    });            
+    });
 
     /* ---------- */
     /*  YC notes  */
@@ -1370,7 +1371,7 @@ $(function () {
         $('#tp_problem_number').val(tp_problem_number);
         var probParams = { form_id: $('#form_id').val(), api: "getproblems" };
         getCollection(probParams, "oProblems", loadProblemSelector);
-	
+
 	//-modalitie Yves 04-29-2017(Try it deleted)
         var form_id = $("#form_id").val();
         var params = { api: "getmodalities", form_id: form_id };
@@ -1396,14 +1397,14 @@ $(function () {
         getCollection(params, "oDischargeCriteria", function () {
               loadList("dischargecriteria_list", "dischargecriteria_item", oDischargeCriteria);
         });
-        
+
         //-diagnosis
         params = { api: "getdiagnosis", form_id: form_id, axis: 1 };
         clearLists("diagnosis_list");
         getCollection(params, "oDiagnosis", function () {
             loadList("diagnosis_list", "diagnosis_item", oDiagnosis); //, { tp_problem_number: tp_problem_number }
         });
-        
+
         //-diagnosis2
         params = { api: "getdiagnosis", form_id: form_id, axis: 2 };
         clearLists("diagnosis2_list");
@@ -1418,21 +1419,21 @@ $(function () {
             hideAddButton("addDiagnosis3",oDiagnosis3);
             loadList("diagnosis3_list", "diagnosis3_item", oDiagnosis3); //, { tp_problem_number: tp_problem_number }
         });
-        
+
         //-diagnosis4
         params = { api: "getdiagnosis", form_id: form_id, axis: 4 };
         clearLists("diagnosis4_list");
         getCollection(params, "oDiagnosis4", function () {
             loadList("diagnosis4_list", "diagnosis4_item", oDiagnosis4); //, { tp_problem_number: tp_problem_number }
         });
-        
+
         //-diagnosis5
         params = { api: "getdiagnosis", form_id: form_id, axis: 5 };
         clearLists("diagnosis5_list");
         getCollection(params, "oDiagnosis5", function () {
             hideAddButton("addDiagnosis5",oDiagnosis5);
             loadList("diagnosis5_list", "diagnosis5_item", oDiagnosis5); //, { tp_problem_number: tp_problem_number }
-        });  
+        });
          //-strength
         var form_id = $("#form_id").val();
         var params = { api: "getstrength", form_id: form_id };
@@ -1458,7 +1459,7 @@ $(function () {
             hideAddButton("addSummary",oSummary);
             loadList("summary_list", "summary_item", oSummary);
         });
-              
+
     };
 
     var hideAddButton = function(addButtonID,object){
@@ -1470,7 +1471,7 @@ $(function () {
             $("#"+addButtonID).removeClass("hidden");
         };
     };
-        
+
     var hideDevInputs = function () {
         if (dev === 1) {
             $(".dev").addClass("hidden");
@@ -1490,7 +1491,7 @@ $.fn.positionOn = function(element, align) {
     var target   = $(this);
     var position = element.position();
 
-    var x      = position.left; 
+    var x      = position.left;
     var y      = position.top;
 
     if(align === 'right') {
@@ -1502,7 +1503,7 @@ $.fn.positionOn = function(element, align) {
     target.css({
       position: 'absolute',
       zIndex:   5000,
-      top:      y, 
+      top:      y,
       left:     x
     });
   });

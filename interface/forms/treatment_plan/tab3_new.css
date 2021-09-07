@@ -11,7 +11,22 @@ body, html {
 	min-width: 1024px;
 }
 
-
+.splitter-panel {
+    background: var(--jqx-background-hover);
+    border-color: var(--jqx-border);
+    color: var(--jqx-background-color-hover);
+    padding: 10px;
+    font-weight: 500;
+    font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    outline: 0;
+}
+.pointer{
+    cursor: pointer;
+}
+.pointer:hover{
+    background: rgb(88, 88, 88);
+}
 .problems-area {
 	height: 100%;
 }
@@ -20,6 +35,8 @@ body, html {
 }
 .bottom-panel {
 	height: 35px;
+    /* position: absolute;
+    bottom: 0; */
 }
 .bottom-panel .btn-group {
 	width: 100%;
@@ -55,7 +72,7 @@ body, html {
 	margin: auto;
     top: calc(50% - 24px);
   }
-  
+
   .bd-example-modal-lg .modal-dialog .modal-content{
     background-color: transparent;
 	box-shadow: none;
@@ -72,4 +89,8 @@ body, html {
 
 .h-100 {
 	height: 100%;
+}
+
+.hide{
+    display: none;
 }

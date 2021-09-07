@@ -48,10 +48,10 @@ $obj = $formid ? formFetch("form_treatment_plan", $formid) : array();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <!-- page querystring parameters -->
 <script type="text/javascript">
-<?php 
-  $formid = 0 + (isset($_GET['formid']) ? $_GET['formid'] : 0); 
+<?php
+  $formid = 0 + (isset($_GET['formid']) ? $_GET['formid'] : 0);
   $dev  = 0 + (isset($_GET['dev']) ? $_GET['dev'] : 0);
-  
+
 ?>
 var dev = <?php echo $dev ?>;
 const theme = 'light';
@@ -61,26 +61,46 @@ const theme = 'light';
 <input type="hidden" id="form-id" value="<?php echo $formid ?>">
 <div id="mainSplitter" style="width: 100%; height: 100%">
     <div>
-      <div style="border: none;" id="jqxExpander">
-        <div>
-            <i class="fa fa-address-card" aria-hidden="true"></i> Problems    
-          </div>
-          <div class="problems-area" style="padding: 0">
-            <div class="problems-panel">
-              <div class="list-group" id="problem-tab" style="margin:0">
-              </div>
+        <div id="subSplitter">
+
+            <div style="border: none; overflow-y:auto;" id="jqxExpander">
+                <div class="splitter-panel">
+                    <i class="fa fa-address-card" aria-hidden="true"></i> Problems
+                </div>
+                <div class="problems-area" style="padding: 0; display:grid">
+                    <div class="problems-panel">
+                    <div class="list-group" id="problem-tab" style="margin:0">
+                    </div>
+                    </div>
+                    <div class="bottom-panel" id="bottomPanel">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary"   disabled onclick="createNewProblem()" id="btn-new-problem"><i class="fa fa-plus" aria-hidden="true"></i> New</button>
+                        <button type="button" class="btn btn-secondary" disabled onclick="editProblem()"      id="btn-edit-problem"><i class="fa fa-pencil" aria-hidden="true"></i>
+                        Edit</button>
+                        <button type="button" class="btn btn-danger" disabled    onclick="deleteProblem()"    id="btn-delete-problem"><i class="fa fa-trash" aria-hidden="true"></i>
+                        Del</button>
+                    </div>
+                    </div>
+                </div>
             </div>
-            <div class="bottom-panel">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary"   disabled onclick="createNewProblem()" id="btn-new-problem"><i class="fa fa-plus" aria-hidden="true"></i> New</button>
-                <button type="button" class="btn btn-secondary" disabled onclick="editProblem()"      id="btn-edit-problem"><i class="fa fa-pencil" aria-hidden="true"></i>
-                 Edit</button>
-                <button type="button" class="btn btn-danger" disabled    onclick="deleteProblem()"    id="btn-delete-problem"><i class="fa fa-trash" aria-hidden="true"></i>
-                  Del</button>
-              </div>
+            <div>
+                <div id="modalityExpander" class="splitter-panel pointer" onclick="displayModality()">
+
+                    <i class="fa fa-address-card" aria-hidden="true"></i> Modality
+
+                </div>
+                <div id="modalityNoteExpander" class="splitter-panel pointer" onclick="displayModalityNote()">
+
+                    <i class="fa fa-address-card" aria-hidden="true"></i> Modality Note
+
+                </div>
+                <div id="dischargeExpander" class="splitter-panel pointer" onclick="displayDischarge()">
+
+                    <i class="fa fa-address-card" aria-hidden="true"></i> Discharge Criteria
+
+                </div>
             </div>
-          </div>
-      </div>
+        </div>
     </div>
     <div class="smartwizard-panel">
       <div id="smartwizard">
@@ -90,11 +110,11 @@ const theme = 'light';
               <li><a href="#step-3">Goals</a></li>
               <li><a href="#step-4">Objectives</a></li>
               <li><a href="#step-5">Interventions</a></li>
-              <li><a href="#step-6">Modality</a></li>
+              <!-- <li><a href="#step-6">Modality</a></li>
               <li><a href="#step-7">Modality Note</a></li>
-              <li><a href="#step-8">Discharge Criteria</a></li>
+              <li><a href="#step-8">Discharge Criteria</a></li> -->
           </ul>
-          
+
           <div class="smartwizard-content">
             <div id="step-1" class="">
               <div class="step-prev-contents"></div>
@@ -130,20 +150,17 @@ const theme = 'light';
                 </div>
               </div>
             </div>
-			
-			<!---->
-			
+
             <div id="step-4" class="">
               <div class="step-prev-contents"></div>
               <br>
-              <!-- 	TEMPORARY - MC --> <!-- <h3>Objectives for Problem</h3> -->
               <div class="step-content-body">
                 <h3 class="step-content-header">Objectives</h3>
                 <div id="objectiveSplitter" style="height: 400px;">
                   <div style="overflow: auto">
                     <div style="border: none;" id="objectiveExpander">
                       <div>
-                        <i class="fa fa-address-card" aria-hidden="true"></i> Goals    
+                        <i class="fa fa-address-card" aria-hidden="true"></i> Goals
                       </div>
                       <div class="goals-area" style="padding: 0">
                         <div class="goals-panel">
@@ -168,14 +185,13 @@ const theme = 'light';
             <div id="step-5" class="">
               <div class="step-prev-contents"></div>
               <br>
-              <!-- 	TEMPORARY - MC --> <!-- <h3>Interventions for Problem</h3> -->
               <div class="step-content-body">
                 <h3 class="step-content-header">Interventions</h3>
                 <div id="interventionSplitter">
                   <div style="overflow: auto">
                     <div style="border: none;" id="interventionExpander">
                       <div>
-                        <i class="fa fa-address-card" aria-hidden="true"></i> Objectives    
+                        <i class="fa fa-address-card" aria-hidden="true"></i> Objectives
                       </div>
                       <div class="objectives-area" style="padding: 0">
                         <div class="objectives-panel">
@@ -197,7 +213,7 @@ const theme = 'light';
                 </div>
               </div>
             </div>
-            <div id="step-6" class="">
+            <!-- <div id="step-6" class="">
               <div class="step-prev-contents"></div>
               <br>
               <div>
@@ -221,11 +237,7 @@ const theme = 'light';
                 <button class="btn btn-danger" id="btn-delete-modality-note" disabled onclick="deleteModalityNote()">Delete</button>
               </div>
               <br>
-              <!-- <div class="step-content-body">
-                <h3 class="step-content-header">Modality Note</h3>
-                <ul class="list-group" id="modality-note-contents">
-                </ul>
-              </div> -->
+
             </div>
             <div id="step-8" class="">
               <div class="step-prev-contents"></div>
@@ -238,8 +250,48 @@ const theme = 'light';
                 <ul class="list-group" id="discharge-contents">
                 </ul>
               </div>
-            </div>
+            </div> -->
           </div>
+      </div>
+      <div id="extraDesc">
+            <div id="step-6" class=" tab-pane step-content hide">
+              <div class="step-prev-contents"></div>
+              <br>
+              <div>
+                <button class="btn btn-primary" onclick="createNewModality()"  id="btn-add-modality">Add Modality</button>
+              </div>
+              <br>
+              <div class="step-content-body">
+                <h3 class="step-content-header">Modality</h3>
+                <div class="list-group" id="modality-contents">
+                </div>
+              </div>
+            </div>
+            <div id="step-7" class="tab-pane step-content hide">
+              <div class="step-prev-contents"></div>
+              <br>
+              <div>
+                <textarea type="text" id="modality-notes" name="" class="form-control" rows="15"></textarea>
+              </div>
+              <div style="margin-top: 10px;">
+                <button class="btn btn-primary" id="btn-add-modality-note" onclick="saveModalityNote(-1)">Add</button>
+                <button class="btn btn-danger" id="btn-delete-modality-note" disabled onclick="deleteModalityNote()">Delete</button>
+              </div>
+              <br>
+
+            </div>
+            <div id="step-8" class="tab-pane step-content hide">
+              <div class="step-prev-contents"></div>
+              <br>
+              <div style="margin-bottom: 30px;">
+                <button class="btn btn-primary" onclick="createNewDischarge()">Add New Discharge Criteria</button>
+              </div>
+              <div class="step-content-body">
+                <h3 class="step-content-header">Discharge Criteria</h3>
+                <ul class="list-group" id="discharge-contents">
+                </ul>
+              </div>
+            </div>
       </div>
     </div>
 </div>

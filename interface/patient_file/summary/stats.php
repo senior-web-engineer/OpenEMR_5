@@ -9,7 +9,7 @@
  * @license   https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
  */
 
-
+$sessionReadOnly = true;
 require_once("../../globals.php");
 require_once("$srcdir/lists.inc");
 require_once("$srcdir/acl.inc");
@@ -24,13 +24,15 @@ if (!CsrfUtils::verifyCsrfToken($_POST["csrf_token_form"])) {
 
 <div id="patient_stats_summary">
 
-<script type='text/javascript'>
-    function load_location( location ) {
-        top.restoreSession();
-        if ( !top.frames["RTop"] ) {
-            document.location=location;
-        } else {
-            top.frames["RTop"].location=location;
+<script>
+    if(typeof load_location === 'undefined') {
+        function load_location(location) {
+            top.restoreSession();
+            if (!top.frames["RTop"]) {
+                document.location = location;
+            } else {
+                top.frames["RTop"].location = location;
+            }
         }
     }
 </script>
@@ -49,9 +51,8 @@ foreach ($ISSUE_TYPES as $key => $arr) {
         continue;
     }
 
-
     $query = "SELECT * FROM lists WHERE pid = ? AND type = ? AND ";
-    $query .= "(enddate is null or enddate = '' or enddate = '0000-00-00') ";
+    $query .= dateEmptySql('enddate');
     if ($GLOBALS['erx_enable'] && $GLOBALS['erx_medication_display'] && $key=='medication') {
         $query .= "and erx_uploaded != '1' ";
     }
@@ -138,7 +139,7 @@ if ($row_currentMed['size'] > 0) {
         if ($_POST['embeddedScreen']) {
             if ($GLOBALS['erx_enable'] && $key == "medication") {
                 $query_uploaded = "SELECT * FROM lists WHERE pid = ? AND type = 'medication' AND ";
-                $query_uploaded .= "(enddate is null or enddate = '' or enddate = '0000-00-00') ";
+                $query_uploaded .= dateEmptySql('enddate');
                 $query_uploaded .= "and erx_uploaded != '1' ";
                 $query_uploaded .= "ORDER BY begdate";
                 $res_uploaded = sqlStatement($query_uploaded, array($pid));
@@ -454,7 +455,7 @@ if ($erx_upload_complete == 1) {
     $fixedWidth = false;
     expand_collapse_widget($widgetTitle, $widgetLabel, $widgetButtonLabel, $widgetButtonLink, $widgetButtonClass, $linkMethod, $bodyClass, $widgetAuth, $fixedWidth);
     $query_uploaded_old = "SELECT * FROM lists WHERE pid = ? AND type = 'medication' AND ";
-    $query_uploaded_old .= "(enddate is null or enddate = '' or enddate = '0000-00-00') ";
+    $query_uploaded_old .= dateEmptySql('enddate');
     $query_uploaded_old .= "ORDER BY begdate";
     $res_uploaded_old = sqlStatement($query_uploaded_old, array($pid));
     echo "<table>";

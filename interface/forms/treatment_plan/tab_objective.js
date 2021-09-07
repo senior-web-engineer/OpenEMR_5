@@ -35,16 +35,16 @@ function loadGoalList() {
         const id = goal.id;
 
         goalTab += `
-            <a class='list-group-item list-group-item-action' 
-                id='objective_${id}' 
-                href='#' 
+            <a class='list-group-item list-group-item-action'
+                id='objective_${id}'
+                href='#'
                 onclick='changeGoal(${id})'
             >
                 ${goal.Description}
             </a>`;
     });
     $('#goal-tab').html(goalTab);
-    
+
 }
 
 function changeGoal(goalId) {
@@ -92,7 +92,7 @@ function loadObjectiveOptions(problemNumber, groupID) {
             if (isChangingProblem) {
                 checkAllLoaded();
             }
-    
+
         }
     })
 }
@@ -116,7 +116,7 @@ function loadObjective() {
             maxObjective = 1;
             arrObjective = resData.data.list;
             let objectiveContents = "";
-            
+
             if (arrObjective) {
 
                 arrObjective.forEach(function(element) {
@@ -156,9 +156,9 @@ function loadObjective() {
             }
                 // $('#objective-contents').html(objectiveContents);
                 // changeObjective(-1, -1);
-            
+
             $('#objective-contents').html(objectiveContents);
-            
+
             if (arrObjective) {
                 selectedInterventionObjectiveId = arrObjective[0].id;
                 loadObjectiveList();
@@ -168,7 +168,7 @@ function loadObjective() {
 
             changeObjective(selectedInterventionObjectiveId);
             loadStep();
-            
+
             if (isChangingProblem) {
                 checkAllLoaded();
             }
@@ -182,7 +182,7 @@ function loadObjective() {
 }
 
 function saveObjective() {
-    
+
     if ($("#objective-select").val() < 0 || !$('#objectiveTargetDate').val() || Number($('#objectiveNoSession')).val < 0) {
         alert("Please insert correct value");
         return;
@@ -192,7 +192,7 @@ function saveObjective() {
         return;
     }
     const selectedProblem = findProblemById(selectedProblemId);
-    
+
     let params;
 
     if (selectedObjectiveId < 0 ) {
@@ -211,7 +211,7 @@ function saveObjective() {
             Description : $("#objective-select option:selected").html(),
             IsCustom : 0,
             IsEvidenceBased : 0,
-            IsDeleted : 0, 
+            IsDeleted : 0,
             problem_id: selectedProblem.id,
             goals_id: selectedObjectiveGoalId
         };
@@ -240,7 +240,7 @@ function createNewObjective() {
     selectedObjectiveId = -1;
 
     if (!arrObjectiveOptions) {
-        
+
         alert('There is no option');
         return;
 
@@ -259,14 +259,14 @@ function editObjective(id) {
     }
 
     selectedObjectiveId = id;
-    
+
     $('#objective-title').html('Edit Objective');
     initObjectiveDialog();
-    
+
 }
 
 function deleteObjective(id) {
-    
+
     if (id < 0 || !confirm("Are you sure you want to delete this Objective?")) {
         return;
     }
@@ -312,17 +312,17 @@ function initObjectiveDialog() {
     $('#objective-label').html(objectiveHeading.selectors[0].heading);
     $('#objectiveNoSession').val("1");
     $('#objective-select').empty().append("<option value='-1'>Please select objective</option>");
-    
+
     arrObjectiveOptions.forEach(function(element) {
         $('#objective-select').append("<option value='" + element.value + "'>" + element.desc + "</option>");
     });
-    
+
     if (selectedObjectiveId > -1) {
 
         const selectedObjective = findObjectiveById(selectedObjectiveId);
 
         $("#objective-select option").filter(function() {
-        
+
             return $(this).text() == selectedObjective.Description;
 
           }).prop('selected', true);

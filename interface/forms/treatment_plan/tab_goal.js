@@ -57,7 +57,7 @@ function loadGoalOptions(problemNumber, groupID) {
 
 
 function loadGoal() {
-    
+
     if (selectedProblemId < 0) {
         return;
     }
@@ -70,7 +70,7 @@ function loadGoal() {
         success: function(resData){
 
     // $.post(loadPath, params, function(resData){
-    
+
             maxGoal = 1;
             arrGoal = resData.data.list;
             let goalContents = "";
@@ -112,21 +112,21 @@ function loadGoal() {
             }
 
             $('#goal-contents').html(goalContents);
-            
+
             if (arrGoal) {
                 loadGoalList();
                 selectedObjectiveGoalId = arrGoal[0].id;
             } else {
                 selectedObjectiveGoalId = -1;
             }
-            
+
             changeGoal(selectedObjectiveGoalId);
             loadStep();
 
             if (isChangingProblem) {
                 checkAllLoaded();
             }
-    
+
         }
     })
 
@@ -143,7 +143,7 @@ function saveGoal() {
         return;
     }
     const selectedProblem = findProblemById(selectedProblemId);
-    
+
     let params;
 
     if (selectedGoalId < 0 ) {
@@ -158,7 +158,7 @@ function saveGoal() {
             GoalNumber : maxGoal,
             Description : $("#modal-first-select option:selected").html(),
             IsCustom : 0,
-            IsDeleted : 0, 
+            IsDeleted : 0,
             problem_id: selectedProblem.id
         };
 
@@ -184,7 +184,7 @@ function createNewGoal() {
     selectedGoalId = -1;
 
     if (!arrGoalOptions) {
-        
+
         alert('There is no option');
         return;
 
@@ -203,14 +203,14 @@ function editGoal(id) {
     }
 
     selectedGoalId = id;
-    
+
     $('#modal-title').html('Edit Goal');
     initGoalDialog();
-    
+
 }
 
 function deleteGoal(id) {
-    
+
     if (id < 0 || !confirm("Are you sure you want to delete this Goal?")) {
         return;
     }
@@ -254,9 +254,9 @@ function initGoalDialog() {
     $('#modal-second').hide();
 
     $('#modal-first-label').html(goalHeading.selectors[0].heading);
-    
+
     $('#modal-first-select').empty().append("<option value='-1'>Please select goal</option>");
-    
+
     arrGoalOptions.forEach(function(element) {
         $('#modal-first-select').append("<option value='" + element.value + "'>" + element.desc + "</option>");
     });
@@ -266,7 +266,7 @@ function initGoalDialog() {
         const selectedGoal = findGoalById(selectedGoalId);
 
         $("#modal-first-select option").filter(function() {
-        
+
             return $(this).text() == selectedGoal.Description;
 
           }).prop('selected', true);

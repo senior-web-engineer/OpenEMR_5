@@ -15,9 +15,9 @@ let   isChangingProblem = false;
 let   libraryId = -1;
 
 $(function() {
-    
+    console.log('tab_problem');
     form_id = $('#form-id').val();
-    
+
     loadHeading();
     loadBehaviorHeading();
     loadGoalHeading();
@@ -51,7 +51,7 @@ function loadLibrary() {
 function loadLibraryProblem() {
 
     const paramsProblem = {id1: form_id, api: 'getSelectorData', controlid: problemHeading.selectors[1].id, id0: libraryId, id2: libraryId};
-        
+
     $.post(selectorPath, paramsProblem, function(resData){
 
         $('#modal-first-select').empty().append("<option value='-1'>Please select problem</option>");
@@ -60,7 +60,7 @@ function loadLibraryProblem() {
             resData.data.list.forEach(function(element) {
 
                 $('#modal-first-select').append("<option value='" + element.value + "'>" + element.desc + "</option>");
-    
+
             });
         }
 
@@ -69,22 +69,22 @@ function loadLibraryProblem() {
             const selectedProblem = findProblemById(selectedProblemId);
 
             $("#modal-first-select option").filter(function() {
-            
+
                 return $(this).text() == selectedProblem.Description;
-    
+
               }).prop('selected', true);
-    
+
         }
     });
 
 }
 
 function loadProblem() {
-    
+
     const params = {form_id : form_id, api: 'getproblems'};
-    
+
     $.post(loadPath, params, function(resData){
-    
+
         maxProblem = 1;
         arrProblem = resData.data.list;
         let problemTab = "";
@@ -115,7 +115,7 @@ function loadProblem() {
 
 // events
 function createNewProblem() {
-    
+
     if (libraryId < 0) {
         showSelectLibrary();
     } else {
@@ -131,7 +131,7 @@ function editProblem() {
     }
 
     $('#add-modal-title').html('Edit Problem');
-    
+
     initDialog();
 
 }
@@ -141,7 +141,7 @@ function deleteProblem() {
     if (selectedProblemId < 0 || !confirm("Are you sure you want to delete this Problem?")) {
         return;
     }
-    
+
     let params = findProblemById(selectedProblemId);
     params.IsDeleted = 1;
     params.api = "saveproblems"
@@ -166,13 +166,13 @@ function updateProblemTab() {
         tabIndx : currTab,
         id : selectedProblemId
     }
-    
+
     $.post(savePath, params, function(){
     });
 }
 
 function saveProblem() {
-    
+
     if ($("#modal-first-select").val() < 0 || libraryId < 0 || Number($('#IsPrimary').val()) < 1) {
         alert("Please insert correct value");
         return;
@@ -192,7 +192,7 @@ function saveProblem() {
             Description : $("#modal-first-select option:selected").html(),
             approach_note : '',
             IsCustom : 0,
-            IsDeleted : 0, 
+            IsDeleted : 0,
             IsPrimary : maxProblem,
         };
 
@@ -213,6 +213,11 @@ function saveProblem() {
 }
 
 function changeProblem(problemId) {
+
+    document.getElementById('step-6').classList.add('hide');
+    document.getElementById('step-7').classList.add('hide');
+    document.getElementById('step-8').classList.add('hide');
+    document.getElementById('smartwizard').classList.remove('hide');
 
     $('#loading').modal('show');
     cleanSteps();
@@ -239,7 +244,7 @@ function changeProblem(problemId) {
     const selectedProblem = findProblemById(problemId);
 
     if (!selectedProblem) {
-        
+
         clearBehavior();
         clearObjective();
         clearIntervention();
@@ -260,17 +265,18 @@ function changeProblem(problemId) {
 
     loadModality();
     loadModalityNotes();
-    
+
     loadDischarge();
 
     loadDiagnosisOptions(selectedProblem.ProblemNumber, selectedProblem.GroupID);
     loadDiagnosis();
 
-    
+
 }
 
 function checkAllLoaded() {
-    if (totalLoadCnt >= 8) {
+    if (totalLoadCnt >= 5) {
+        // if (totalLoadCnt >= 8) {
         gotoStep(currTab);
         isChangingProblem = false;
         $('#loading').modal('hide');
@@ -312,9 +318,9 @@ function initDialog() {
 
     $('#IsPrimary').val(selectedProblemId > -1 ? findProblemById(selectedProblemId).IsPrimary : maxProblem);
     $('#modal-first-label').html(problemHeading.selectors[1].heading);
-    
+
     $('#modal-first-select').empty().append("<option value='-1'>Please select problem</option>");
-    
+
     $('#btn-save').off('click');
 
     $('#btn-save').on('click', function() {
@@ -322,13 +328,13 @@ function initDialog() {
     });
 /*
     if (selectedProblemId >= 0) {
-        
+
         const selectedProblem = findProblemById(selectedProblemId);
 
         $('#modal-first-select').val(selectedProblem.GroupID);
 
         loadLibraryProblem();
-        
+
     }
 */
     loadLibraryProblem();
@@ -347,9 +353,9 @@ function showSelectLibrary() {
     $('#modal-first').show();
 
     $('#modal-first-label').html(problemHeading.selectors[0].heading);
-    
+
     $('#modal-first-select').empty().append("<option value='-1'>Please select library</option>");
-    
+
     arrLibrary.list.forEach(function(element) {
         $('#modal-first-select').append("<option value='" + element.value + "'>" + element.desc + "</option>");
     });

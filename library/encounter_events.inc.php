@@ -98,6 +98,7 @@ function todaysEncounterCheck($patient_id, $enc_date = '', $reason = '', $fac_id
     $facility = $tmprow['facility'];
     $facility_id = $fac_id ? (int)$fac_id : $tmprow['facility_id'];
     $billing_facility = $billing_fac ? (int)$billing_fac : $tmprow['facility_id'];
+    $pos_code = sqlQuery("SELECT pos_code FROM facility WHERE id = ?", array($facility_id))['pos_code'];
     $visit_cat = $cat ? $cat : '(NULL)';
     $conn = $GLOBALS['adodb']['db'];
     $encounter = $conn->GenID("sequences");
@@ -114,8 +115,9 @@ function todaysEncounterCheck($patient_id, $enc_date = '', $reason = '', $fac_id
             "provider_id = ?, " .
             "pid = ?, " .
             "encounter = ?," .
-            "pc_catid = ?",
-            array($dos,$visit_reason,$facility,$facility_id,$billing_facility,$visit_provider,$patient_id,$encounter,$visit_cat)
+            "pc_catid = ?," .
+            "pos_code = ?",
+            array($dos,$visit_reason,$facility,$facility_id,$billing_facility,$visit_provider,$patient_id,$encounter,$visit_cat, $pos_code)
         ),
         "newpatient",
         $patient_id,
@@ -368,13 +370,13 @@ function InsertEvent($args, $from = 'general')
     if ($from == 'general') {
         $pc_eid = sqlInsert(
             "INSERT INTO openemr_postcalendar_events ( " .
-            "pc_catid, pc_multiple, pc_aid, pc_pid, pc_gid, pc_title, pc_time, pc_hometext, pc_roomlink," .
+            "pc_catid, pc_multiple, pc_aid, pc_pid, pc_gid, pc_title, pc_time, pc_hometext, " .
             "pc_informant, pc_eventDate, pc_endDate, pc_duration, pc_recurrtype, " .
             "pc_recurrspec, pc_startTime, pc_endTime, pc_alldayevent, " .
             "pc_apptstatus, pc_prefcatid, pc_location, pc_eventstatus, pc_sharing, pc_facility,pc_billing_location,pc_room " .
-            ") VALUES (?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,1,?,?,?)",
+            ") VALUES (?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?,?,?,?,?,?,?,1,1,?,?,?)",
             array($args['form_category'],(isset($args['new_multiple_value']) ? $args['new_multiple_value'] : ''),$args['form_provider'],$form_pid,$form_gid,
-            $args['form_title'],$args['form_comments'],$args['form_roomlink'],$_SESSION['authUserID'],$args['event_date'],
+            $args['form_title'],$args['form_comments'],$_SESSION['authUserID'],$args['event_date'],
             fixDate($args['form_enddate']),$args['duration'],$pc_recurrtype,serialize($args['recurrspec']),
             $args['starttime'],$args['endtime'],$args['form_allday'],$args['form_apptstatus'],$args['form_prefcat'],
             $args['locationspec'],(int)$args['facility'],(int)$args['billing_facility'],$form_room)

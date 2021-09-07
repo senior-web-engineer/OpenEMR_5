@@ -1174,6 +1174,7 @@ CREATE TABLE `documents` (
   `audit_master_id` int(11) default NULL,
   `documentationOf` varchar(255) DEFAULT NULL,
   `encrypted` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '0->No,1->Yes',
+  `document_data`  MEDIUMTEXT,
   PRIMARY KEY  (`id`),
   KEY `revision` (`revision`),
   KEY `foreign_id` (`foreign_id`),
@@ -5302,10 +5303,10 @@ CREATE TABLE `openemr_postcalendar_events` (
   `pc_sendalertemail` VARCHAR( 3 ) NOT NULL DEFAULT 'NO',
   `pc_billing_location` SMALLINT (6) NOT NULL DEFAULT '0',
   `pc_room` varchar(20) NOT NULL DEFAULT '',
-  `pc_roomlink` varchar(128) default NULL,
   PRIMARY KEY  (`pc_eid`),
   KEY `basic_event` (`pc_catid`,`pc_aid`,`pc_eventDate`,`pc_endDate`,`pc_eventstatus`,`pc_sharing`,`pc_topic`),
-  KEY `pc_eventDate` (`pc_eventDate`)
+  KEY `pc_eventDate` (`pc_eventDate`),
+  KEY `index_pcid` (`pc_pid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 ;
 
 -----------------------------------------------------------
@@ -5316,12 +5317,14 @@ CREATE TABLE `openemr_postcalendar_events` (
 
 DROP TABLE IF EXISTS `patient_access_onsite`;
 CREATE TABLE `patient_access_onsite`(
-  `id` INT NOT NULL AUTO_INCREMENT ,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `pid` bigint(20),
-  `portal_username` VARCHAR(100) ,
-  `portal_pwd` VARCHAR(100) ,
+  `portal_username` VARCHAR(100),
+  `portal_pwd` VARCHAR(100),
   `portal_pwd_status` TINYINT DEFAULT '1' COMMENT '0=>Password Created Through Demographics by The provider or staff. Patient Should Change it at first time it.1=>Pwd updated or created by patient itself',
-  `portal_salt` VARCHAR(100) ,
+  `portal_salt` VARCHAR(100),
+  `portal_login_username` varchar(100) DEFAULT NULL COMMENT 'User entered username',
+  `portal_onetime`  VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1;
 
@@ -6603,6 +6606,8 @@ INSERT INTO `supported_external_dataloads` (`load_type`, `load_source`, `load_re
 INSERT INTO `supported_external_dataloads` (`load_type`, `load_source`, `load_release_date`, `load_filename`, `load_checksum`) VALUES ('ICD10', 'CMS', '2018-10-01', '2019-ICD-10-CM-Code-Descriptions.zip', 'b23e0128eb2dce0cb007c31638a8dc00');
 INSERT INTO `supported_external_dataloads` (`load_type`, `load_source`, `load_release_date`, `load_filename`, `load_checksum`) VALUES ('ICD10', 'CMS', '2018-10-01', '2019-ICD-10-PCS-Order-File.zip', 'eb545fe61ada9efad0ad97a669f8671f');
 INSERT INTO `supported_external_dataloads` (`load_type`, `load_source`, `load_release_date`, `load_filename`, `load_checksum`) VALUES ('CQM_VALUESET', 'NIH_VSAC', '2017-09-29', 'ep_ec_only_cms_20170929.xml.zip','38d2e1a27646f2f09fcc389fd2335c50');
+INSERT INTO `supported_external_dataloads` (`load_type`, `load_source`, `load_release_date`, `load_filename`, `load_checksum`) VALUES ('ICD10', 'CMS', '2019-10-01', '2020-ICD-10-CM-Codes.zip', '745546b3c94af3401e84003e1b143b9b');
+INSERT INTO `supported_external_dataloads` (`load_type`, `load_source`, `load_release_date`, `load_filename`, `load_checksum`) VALUES ('ICD10', 'CMS', '2019-10-01', '2020-ICD-10-PCS-Order.zip', '8dc136d780ec60916e9e1fc999837bc8');
 -----------------------------------------------------------
 
 --
@@ -6689,6 +6694,8 @@ CREATE TABLE `users` (
   `physician_type` VARCHAR(50) DEFAULT NULL,
   `main_menu_role` VARCHAR(50) NOT NULL DEFAULT 'standard',
   `patient_menu_role` VARCHAR(50) NOT NULL DEFAULT 'standard',
+  `portal_user` tinyint(1) NOT NULL DEFAULT '0',
+  `supervisor_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 ;
 
@@ -9936,7 +9943,8 @@ CREATE TABLE `medex_outgoing` (
   `msg_extra_text` text,
   `medex_uid` int(11),
   PRIMARY KEY (`msg_uid`),
-  UNIQUE KEY `msg_eid` (`msg_uid`,`msg_pc_eid`,`medex_uid`)
+  UNIQUE KEY `msg_eid` (`msg_uid`,`msg_pc_eid`,`medex_uid`),
+  KEY `i_msg_date` (`msg_date`)
 ) ENGINE=InnoDB;
 
 --
@@ -9986,7 +9994,8 @@ CREATE TABLE `medex_recalls` (
   `r_reason` varchar(255) DEFAULT NULL,
   `r_created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`r_ID`),
-  UNIQUE KEY `r_PRACTID` (`r_PRACTID`,`r_pid`)
+  UNIQUE KEY `r_PRACTID` (`r_PRACTID`,`r_pid`),
+  KEY `i_eventDate` (`r_eventDate`)
 ) ENGINE=InnoDB;
 
 
@@ -10549,6 +10558,8 @@ CREATE TABLE `api_token` (
     `id`           bigint(20) NOT NULL AUTO_INCREMENT,
     `user_id`      bigint(20) NOT NULL,
     `token`        varchar(256) DEFAULT NULL,
+    `token_auth_salt` varchar(255),
+    `token_auth` varchar(255),
     `expiry`       datetime NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;

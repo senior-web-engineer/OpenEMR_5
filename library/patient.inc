@@ -6,9 +6,9 @@
  * @link      http://www.open-emr.org
  * @author    Brady Miller <brady.g.miller@gmail.com>
  * @copyright Copyright (c) 2018-2019 Brady Miller <brady.g.miller@gmail.com>
+ * @copyright Copyright (c) 2019 Sherwin Gaddis <sherwingaddis@gmail.com>
  * @license   https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
  */
-
 
 use OpenEMR\Services\FacilityService;
 
@@ -81,13 +81,6 @@ function getInsuranceProvider($ins_id)
     return $row['name'];
 }
 
-function getInsuranceProviderType($ins_id)
-{
-
-    $sql = "select name, billing_code_type from insurance_companies where id=?";
-    $row = sqlQuery($sql, array($ins_id));
-    return $row['billing_code_type'];
-}
 function getInsuranceProviders()
 {
     $returnval = array();
@@ -437,19 +430,19 @@ function getEthnoRacials()
 // library/clinical_rules.php script for example of this.
 function getHistoryData($pid, $given = "*", $dateStart = '', $dateEnd = '')
 {
-
-    if ($dateStart && $dateEnd) {
-        $res = sqlQuery("select $given from history_data where pid = ? and date >= ? and date <= ? order by date DESC limit 0,1", array($pid,$dateStart,$dateEnd));
-    } elseif ($dateStart && !$dateEnd) {
-        $res = sqlQuery("select $given from history_data where pid = ? and date >= ? order by date DESC limit 0,1", array($pid,$dateStart));
-    } elseif (!$dateStart && $dateEnd) {
-        $res = sqlQuery("select $given from history_data where pid = ? and date <= ? order by date DESC limit 0,1", array($pid,$dateEnd));
-    } else {
-        $res = sqlQuery("select $given from history_data where pid=? order by date DESC limit 0,1", array($pid));
+    $where = '';
+    if ($given == 'tobacco') {
+        $where = 'tobacco is not null and';
     }
 
-    if ($given == 'tobacco') {
-        $res = sqlQuery("select $given from history_data where pid = ? and tobacco is not null and date >= ? and date <= ? order by date DESC limit 0,1", array($pid,$dateStart,$dateEnd));
+    if ($dateStart && $dateEnd) {
+        $res = sqlQuery("select $given from history_data where $where pid = ? and date >= ? and date <= ? order by date DESC limit 0,1", array($pid,$dateStart,$dateEnd));
+    } elseif ($dateStart && !$dateEnd) {
+        $res = sqlQuery("select $given from history_data where $where pid = ? and date >= ? order by date DESC limit 0,1", array($pid,$dateStart));
+    } elseif (!$dateStart && $dateEnd) {
+        $res = sqlQuery("select $given from history_data where $where pid = ? and date <= ? order by date DESC limit 0,1", array($pid,$dateEnd));
+    } else {
+        $res = sqlQuery("select $given from history_data where $where pid=? order by date DESC limit 0,1", array($pid));
     }
 
     return $res;
@@ -487,22 +480,6 @@ function getInsuranceDataByDate(
 
 // To prevent sql injection on this function, if a variable is used for $given parameter, then
 // it needs to be escaped via whitelisting prior to using this function.
-function getInsurancePnDataByDate(
-    $pid,
-    $date,
-    $type,
-    $given = "insd.*, DATE_FORMAT(subscriber_DOB,'%m/%d/%Y') as subscriber_DOB, ic.name as provider_name"
-) {
- // this must take the date in the following manner: YYYY-MM-DD
-  // this function recalls the insurance value that was most recently enterred from the
-  // given date. it will call up most recent records up to and on the date given,
-  // but not records enterred after the given date
-    $sql = "select * from insurance_data as insd " .
-    "left join insurance_companies as ic on ic.id = provider " .
-    "where pid = ? and date_format(date,'%Y-%m-%d') <= ? and " .
-    "type=? order by date DESC limit 1";
-    return sqlQuery($sql, array($pid,$date,$type));
-}
 function getEmployerData($pid, $given = "*")
 {
     $sql = "select $given from employer_data where pid=? order by date DESC limit 0,1";
@@ -1504,7 +1481,7 @@ function getPatientAge($dobYMD, $nowYMD = null)
     $dobYMD = preg_replace("/-/", "", $dobYMD);
     $dobDay = substr($dobYMD, 6, 2);
     $dobMonth = substr($dobYMD, 4, 2);
-    $dobYear = substr($dobYMD, 0, 4);
+    $dobYear = (int) substr($dobYMD, 0, 4);
 
     // set the 'now' date values
     if ($nowYMD == null) {
@@ -1995,8 +1972,9 @@ function is_patient_deceased($pid, $date = '')
   // Query for deceased status (if person is deceased gets days_deceased and date_deceased)
     $results = sqlQuery("SELECT DATEDIFF(?,`deceased_date`) AS `days_deceased`, `deceased_date` AS `date_deceased` " .
                       "FROM `patient_data` " .
-                      "WHERE `pid` = ? AND `deceased_date` IS NOT NULL AND `deceased_date` != '0000-00-00 00:00:00' AND 
-                      `deceased_date` <= ?", array($date,$pid,$date));
+                      "WHERE `pid` = ? AND " .
+                      dateEmptySql('deceased_date', true, true) .
+                      "AND `deceased_date` <= ?", array($date,$pid,$date));
 
     if (empty($results)) {
         // Patient is alive, so return false
