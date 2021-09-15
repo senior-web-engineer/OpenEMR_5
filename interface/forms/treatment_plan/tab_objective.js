@@ -120,6 +120,7 @@ function loadObjective() {
             if (arrObjective) {
 
                 arrObjective.forEach(function(element) {
+                    maxObjective +=1;
                     // If not objective of selected goal, then return
                     if (element.goals_id != selectedObjectiveGoalId) {
                         return;
@@ -148,7 +149,7 @@ function loadObjective() {
                     objectiveContents += '</p>';
                     objectiveContents += '</a>';
 
-                    maxObjective = Math.max(maxObjective, (Number(element.ObjectiveNumber) + 1));
+                    // maxObjective = Math.max(maxObjective, (Number(element.ObjectiveNumber) + 1));
 
                 });
                 // $('#objective-contents').html(objectiveContents);
