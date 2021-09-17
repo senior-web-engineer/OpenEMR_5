@@ -120,7 +120,7 @@ function loadObjective() {
             if (arrObjective) {
 
                 arrObjective.forEach(function(element) {
-                    maxObjective +=1;
+                    // maxObjective +=1;
                     // If not objective of selected goal, then return
                     if (element.goals_id != selectedObjectiveGoalId) {
                         return;
@@ -149,7 +149,7 @@ function loadObjective() {
                     objectiveContents += '</p>';
                     objectiveContents += '</a>';
 
-                    // maxObjective = Math.max(maxObjective, (Number(element.ObjectiveNumber) + 1));
+                    maxObjective = Math.max(maxObjective, (Number(element.ObjectiveNumber) + 1));
 
                 });
                 // $('#objective-contents').html(objectiveContents);
@@ -208,7 +208,8 @@ function saveObjective() {
             IsCritical : 0,
             GroupID : selectedProblem.GroupID,
             ProblemNumber : selectedProblem.ProblemNumber,
-            ObjectiveNumber : maxObjective,
+            // ObjectiveNumber : maxObjective,
+            ObjectiveNumber : $("#objective-select option:selected").val(),
             Description : $("#objective-select option:selected").html(),
             IsCustom : 0,
             IsEvidenceBased : 0,
